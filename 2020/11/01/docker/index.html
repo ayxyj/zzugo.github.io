@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    小算法题 |  Syraer&#39;s Blog
+    Docker - 01 - 入门啊 |  Syraer&#39;s Blog
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -46,7 +46,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-1"
+  id="post-docker"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -57,18 +57,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  小算法题
+  Docker - 01 - 入门啊
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2019/12/13/1/" class="article-date">
-  <time datetime="2019-12-12T20:38:59.000Z" itemprop="datePublished">2019-12-13</time>
+      <a href="/2020/11/01/docker/" class="article-date">
+  <time datetime="2020-11-01T06:38:59.000Z" itemprop="datePublished">2020-11-01</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/Algorithm/">Algorithm</a>
+    <a class="article-category-link" href="/categories/Docker/">Docker</a>
   </div>
   
 <div class="word_count">
@@ -174,7 +174,10 @@
 <p>cat &gt;/yum.repos.d/ftp_7.repo &lt;&lt;EOF<br>[ftp]<br>name=ftpbase<br>baseurl=<a href="ftp://10.0.0.100/centos7.5">ftp://10.0.0.100/centos7.5</a><br>enabled=1<br>gpgcheck=0<br>EOF</p>
 <h2 id="搭建本地的yum仓库，并通过vsftpd-和-httpd-共享该目录"><a href="#搭建本地的yum仓库，并通过vsftpd-和-httpd-共享该目录" class="headerlink" title="搭建本地的yum仓库，并通过vsftpd 和 httpd 共享该目录"></a>搭建本地的yum仓库，并通过vsftpd 和 httpd 共享该目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">yum install httpd vsftpd lftp -y &#x2F;&#x2F;安装三个服务</span><br><span class="line"></span><br><span class="line">mount -o loop  &#x2F;centos6.5.iso &#x2F;var&#x2F;www&#x2F;html&#x2F;ftp&#x2F;centos6.5  &#x2F;&#x2F;注意路径，挂在对应的iso到对应目录下</span><br><span class="line"></span><br><span class="line">systemctl start httpd vsftpd &#x2F;&#x2F;启动服务</span><br><span class="line"></span><br><span class="line">systemctl enable httpd vsftpd &#x2F;&#x2F;开机自启动</span><br><span class="line"></span><br><span class="line">systemctl disable firewalld &#x2F;&#x2F;关闭防火墙开机自启动</span><br><span class="line"></span><br><span class="line">systemctl stop firewalld &#x2F;&#x2F;关闭防火墙</span><br><span class="line"></span><br><span class="line">systemctl status firewalld &#x2F;&#x2F;查看防火墙状态</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<h2 id="通过上面的服务搭建以及配置接下来可以进行yum仓库的配置，由于搭建镜像的本地服务中，镜像挂在点有repodata-及其配置文件，此时可以不用配置repomd-xml等，可以省略。若搭建其他需要通过下述命令进行配置"><a href="#通过上面的服务搭建以及配置接下来可以进行yum仓库的配置，由于搭建镜像的本地服务中，镜像挂在点有repodata-及其配置文件，此时可以不用配置repomd-xml等，可以省略。若搭建其他需要通过下述命令进行配置" class="headerlink" title="通过上面的服务搭建以及配置接下来可以进行yum仓库的配置，由于搭建镜像的本地服务中，镜像挂在点有repodata/及其配置文件，此时可以不用配置repomd.xml等，可以省略。若搭建其他需要通过下述命令进行配置"></a>通过上面的服务搭建以及配置接下来可以进行yum仓库的配置，由于搭建镜像的本地服务中，镜像挂在点有repodata/及其配置文件，此时可以不用配置repomd.xml等，可以省略。若搭建其他需要通过下述命令进行配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install  createrepo -y &#x2F;&#x2F;安装createrepo ，用于构建repodata</span><br><span class="line"></span><br><span class="line">createrepo  &#x2F;var&#x2F;www&#x2F;html&#x2F;ftp       &#x2F;&#x2F;此时就会该目录下生成repodata&#x2F;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过上面的服务搭建以及配置接下来可以进行yum仓库的配置，由于搭建镜像的本地服务中，镜像挂在点有repodata/及其配置文件，此时可以不用配置repomd.xml等，可以省略。若搭建其他需要通过下述命令进行配置</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install  createrepo -y &#x2F;&#x2F;安装createrepo ，用于构建repodata</span><br><span class="line"></span><br><span class="line">createrepo  &#x2F;var&#x2F;www&#x2F;html&#x2F;ftp       &#x2F;&#x2F;此时就会该目录下生成repodata&#x2F;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h2 id="根据yum仓库的配置文件创建一个本地的repo文件"><a href="#根据yum仓库的配置文件创建一个本地的repo文件" class="headerlink" title="根据yum仓库的配置文件创建一个本地的repo文件"></a>根据yum仓库的配置文件创建一个本地的repo文件</h2><p>要记得修改vsftpd的默认路径 </p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">local_root=/var/www/html</span><br><span class="line">chroot_local_user=YES</span><br><span class="line">anon_root=/var/www/html</span><br></pre></td></tr></table></figure>
@@ -182,9 +185,9 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/yum.repos.d/ftp_6.repo &lt;&lt;<span class="string">EOF </span></span><br><span class="line"><span class="string">[ftp]</span></span><br><span class="line"><span class="string">name=ftpbase</span></span><br><span class="line"><span class="string">baseurl=ftp://192.168.100.4/var/www/html/ftp</span></span><br><span class="line"><span class="string">enabled=1</span></span><br><span class="line"><span class="string">gpgcheck=0</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="通过浏览器访问测试"><a href="#通过浏览器访问测试" class="headerlink" title="通过浏览器访问测试"></a>通过浏览器访问测试</h2><p><a href="ftp://192.168.100.4/">ftp://192.168.100.4/</a></p>
-<p><img src=".%5C1604218985268.png" alt="1"></p>
+<p><img src="..%5Cimg%5C1604218985268.png" alt="1"></p>
 <p><a target="_blank" rel="noopener" href="http://192.168.100.4/ftp/">http://192.168.100.4/ftp/</a></p>
-<p><img src=".%5C1604218985268.png" alt="2"></p>
+<p><img src="..%5Cimg%5C1604218985268.png" alt="2"></p>
  
       <!-- reward -->
       
@@ -249,12 +252,12 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2019/12/13/1/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2020/11/01/docker/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>  
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Algorithm/" rel="tag">Algorithm</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li></ul>
 
     </footer>
   </div>
@@ -263,7 +266,7 @@
   <nav class="article-nav">
     
     
-      <a href="/2019/01/23/Blog/" class="article-nav-link">
+      <a href="/2019/01/23/markdown/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
         <div class="article-nav-title">MarkDown语法</div>
       </a>
@@ -280,8 +283,8 @@
 <script>
   new Valine({
     el: "#vcomments",
-    app_id: "",
-    app_key: "",
+    app_id: "TeJhVuUSrasQYTxdBWOzzhfN-gzGzoHsz",
+    app_key: "0zHtp5jbdUnzBM9aw0joIGOa",
     path: window.location.pathname,
     avatar: "monsterid",
     placeholder: "给我的文章加点评论吧~",
