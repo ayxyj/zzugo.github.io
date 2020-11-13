@@ -106,12 +106,12 @@
 <p><strong>单群组**</strong>FISCO BCOS**<strong>联盟链的搭建</strong></p>
 <h2 id="准备环境"><a href="#准备环境" class="headerlink" title="准备环境"></a><strong>准备环境</strong></h2><h3 id="安装centos依赖"><a href="#安装centos依赖" class="headerlink" title="安装centos依赖"></a>安装centos依赖</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y openssl openssl-devel</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img src="/2020/11/11/fb/.%5C1.png" alt="1"></p>
+<p><img src="/2020/11/11/fb/1.png" alt="1"></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~ &amp;&amp; mkdir -p fisco &amp;&amp; <span class="built_in">cd</span> fisco</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>​    下载build_chain.sh脚本</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">curl -<span class="comment">#LO https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v2.6.0/build_chain.sh &amp;&amp; chmod u+x build_chain.sh</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/.%5C2.png" alt="2"></p>
+<p><img src="/2020/11/11/fb/2.png" alt="2"></p>
 <h3 id="搭建单群组-4-节点联盟链"><a href="#搭建单群组-4-节点联盟链" class="headerlink" title="搭建单群组**4**节点联盟链"></a><strong>搭建单群组**</strong>4**<strong>节点联盟链</strong></h3><p>在fisco目录下执行下面的指令，生成一条单群组4节点的FISCO链。 请确保机器的30300<del>30303，20200</del>20203，8545~8548端口没有被占用。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">**注解**</span><br><span class="line"></span><br><span class="line">&gt; 国密版本请执行 bash build_chain.sh -l 127.0.0.1:4 -p 30300,20200,8545 -g -G</span><br><span class="line"></span><br><span class="line">&gt; 其中-g表示生成国密配置，-G表示使用国密SSL连接</span><br><span class="line"></span><br><span class="line">&gt; web3sdk已经支持国密SSL，如果使用web3sdk建议带上-G选项使用国密SSL</span><br><span class="line"></span><br><span class="line">bash build_chain.sh -l 127.0.0.1:4 -p 30300,20200,8545</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 

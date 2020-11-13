@@ -76,7 +76,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">181</span>
+            <span class="post-count">219</span>
         </span>
     </span>
 
@@ -106,6 +106,8 @@
 <img src="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/2.png" alt="install"><h2 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h2></li>
 <li>通过命令，创建一篇新的文章时候，自动在source/_post/新建对应文件名称的文件夹（为了避免有时候文章中并没有图片，可以手动创建md文件，需要图片在创建文件夹即可）<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new test.md</span><br></pre></td></tr></table></figure></li>
 <li>进入source/_post/下即可看到对应创建的文件和文件夹<h2 id="第四步"><a href="#第四步" class="headerlink" title="第四步"></a>第四步</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean  <span class="comment">#清除</span></span><br><span class="line">hexo ge    <span class="comment">#生成静态资源 ， 此时可以通过输出信息看到对应的图片名称信息，基本就完成了</span></span><br><span class="line">hexo s     <span class="comment">#本地查看是否生效</span></span><br></pre></td></tr></table></figure>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2></li>
+<li>在md文件中，图片的路径可以写一下两种方式都可以load到图片的路径<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">![test1](./1.png)</span><br><span class="line">![test1](./<span class="built_in">test</span>/2.png)</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
  

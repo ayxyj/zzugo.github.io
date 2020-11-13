@@ -183,6 +183,8 @@
 <img src="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/2.png" alt="install"><h2 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h2></li>
 <li>通过命令，创建一篇新的文章时候，自动在source/_post/新建对应文件名称的文件夹（为了避免有时候文章中并没有图片，可以手动创建md文件，需要图片在创建文件夹即可）<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new test.md</span><br></pre></td></tr></table></figure></li>
 <li>进入source/_post/下即可看到对应创建的文件和文件夹<h2 id="第四步"><a href="#第四步" class="headerlink" title="第四步"></a>第四步</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean  <span class="comment">#清除</span></span><br><span class="line">hexo ge    <span class="comment">#生成静态资源 ， 此时可以通过输出信息看到对应的图片名称信息，基本就完成了</span></span><br><span class="line">hexo s     <span class="comment">#本地查看是否生效</span></span><br></pre></td></tr></table></figure>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2></li>
+<li>在md文件中，图片的路径可以写一下两种方式都可以load到图片的路径<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">![test1](./1.png)</span><br><span class="line">![test1](./<span class="built_in">test</span>/2.png)</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
  
@@ -317,12 +319,12 @@
 <p><strong>单群组**</strong>FISCO BCOS**<strong>联盟链的搭建</strong></p>
 <h2 id="准备环境"><a href="#准备环境" class="headerlink" title="准备环境"></a><strong>准备环境</strong></h2><h3 id="安装centos依赖"><a href="#安装centos依赖" class="headerlink" title="安装centos依赖"></a>安装centos依赖</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y openssl openssl-devel</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img src="/2020/11/11/fb/.%5C1.png" alt="1"></p>
+<p><img src="/2020/11/11/fb/1.png" alt="1"></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~ &amp;&amp; mkdir -p fisco &amp;&amp; <span class="built_in">cd</span> fisco</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>​    下载build_chain.sh脚本</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">curl -<span class="comment">#LO https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v2.6.0/build_chain.sh &amp;&amp; chmod u+x build_chain.sh</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/.%5C2.png" alt="2"></p>
+<p><img src="/2020/11/11/fb/2.png" alt="2"></p>
 <h3 id="搭建单群组-4-节点联盟链"><a href="#搭建单群组-4-节点联盟链" class="headerlink" title="搭建单群组**4**节点联盟链"></a><strong>搭建单群组**</strong>4**<strong>节点联盟链</strong></h3><p>在fisco目录下执行下面的指令，生成一条单群组4节点的FISCO链。 请确保机器的30300<del>30303，20200</del>20203，8545~8548端口没有被占用。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">**注解**</span><br><span class="line"></span><br><span class="line">&gt; 国密版本请执行 bash build_chain.sh -l 127.0.0.1:4 -p 30300,20200,8545 -g -G</span><br><span class="line"></span><br><span class="line">&gt; 其中-g表示生成国密配置，-G表示使用国密SSL连接</span><br><span class="line"></span><br><span class="line">&gt; web3sdk已经支持国密SSL，如果使用web3sdk建议带上-G选项使用国密SSL</span><br><span class="line"></span><br><span class="line">bash build_chain.sh -l 127.0.0.1:4 -p 30300,20200,8545</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
