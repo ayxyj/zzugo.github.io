@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    Sublime 乱码问题及插件安装 |  Syraer&#39;s Blog
+    Hexo_本地图片如何上传到Github |  Syraer&#39;s Blog
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -46,7 +46,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-sublime配置"
+  id="post-Hexo-本地图片-md"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -57,18 +57,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  Sublime 乱码问题及插件安装
+  Hexo_本地图片如何上传到Github
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2020/11/13/sublime%E9%85%8D%E7%BD%AE/" class="article-date">
-  <time datetime="2020-11-13T02:21:29.000Z" itemprop="datePublished">2020-11-13</time>
+      <a href="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/" class="article-date">
+  <time datetime="2020-11-13T09:49:25.000Z" itemprop="datePublished">2020-11-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/Sublime/">Sublime</a>
+    <a class="article-category-link" href="/categories/hexo/">hexo</a>
   </div>
   
 <div class="word_count">
@@ -76,7 +76,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">347</span>
+            <span class="post-count">181</span>
         </span>
     </span>
 
@@ -100,26 +100,12 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="sublime-解决中文乱码问题"><a href="#sublime-解决中文乱码问题" class="headerlink" title="sublime 解决中文乱码问题"></a>sublime 解决中文乱码问题</h2><h3 id="1-通过快捷键-ctrl-进入命令行，并输入以下命令然后回车"><a href="#1-通过快捷键-ctrl-进入命令行，并输入以下命令然后回车" class="headerlink" title="1.通过快捷键 ctrl + ~ 进入命令行，并输入以下命令然后回车"></a>1.通过快捷键 ctrl + ~ 进入命令行，并输入以下命令然后回车</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import urllib.request,os,hashlib; h = <span class="string">&#x27;7183a2d3e96f11eeadd761d777e62404e330c659d4bb41d3bdf022e94cab3cd0&#x27;</span>; pf = <span class="string">&#x27;Package Control.sublime-package&#x27;</span>; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( <span class="string">&#x27;http://sublime.wbond.net/&#x27;</span> + pf.replace(<span class="string">&#x27; &#x27;</span>, <span class="string">&#x27;%20&#x27;</span>)).<span class="built_in">read</span>(); dh = hashlib.sha256(by).hexdigest(); <span class="built_in">print</span>(<span class="string">&#x27;Error validating download (got %s instead of %s), please try manual install&#x27;</span> % (dh, h)) <span class="keyword">if</span> dh != h <span class="keyword">else</span> open(os.path.join( ipp, pf), <span class="string">&#x27;wb&#x27;</span> ).write(by)</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>这是由于网络访问网站<a target="_blank" rel="noopener" href="http://packagecontrol.io/%E6%97%A0%E6%B3%95%E8%AE%BF%E9%97%AE%E6%88%90%E5%8A%9F%E5%AF%BC%E8%87%B4%E7%9A%84%EF%BC%8C%E6%89%80%E4%BB%A5%E7%A1%AE%E4%BF%9D%E8%83%BD%E5%A4%9F%E8%AE%BF%E9%97%AE%E8%AF%A5%E7%BD%91%E5%9D%80%E6%97%B6%E6%89%8D%E8%83%BD%E7%BB%A7%E7%BB%AD%E5%AE%89%E8%A3%85%EF%BC%8C%E8%BF%99%E9%87%8C%E6%88%91%E7%9B%B4%E6%8E%A5%E9%80%9A%E8%BF%87%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E5%BC%8F%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%AE%BF%E9%97%AE%E4%BA%86%EF%BC%8C%E4%BD%86%E6%98%AF%E5%8F%88%E5%87%BA%E7%8E%B0%E4%BA%86%E4%B8%8B%E9%9D%A2%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9A">http://packagecontrol.io/无法访问成功导致的，所以确保能够访问该网址时才能继续安装，这里我直接通过科学上网的方式就可以访问了，但是又出现了下面的问题：</a></p>
-</li>
-<li><p>根据报错信息将该命令中的str1 字符串换成str2再重试即可发现成功</p>
-</li>
-</ul>
-<h3 id="2-安装ConvertToUTF8。"><a href="#2-安装ConvertToUTF8。" class="headerlink" title="2.安装ConvertToUTF8。"></a>2.安装ConvertToUTF8。</h3><ul>
-<li><p>通过快捷键 Ctrl + shift + P，然后在弹出的输入框输入 install，选择Package Control：install Package回车</p>
-</li>
-<li><p>在出现的插件命令行搜索ConvertToUTF8，选中回车进行插件安装</p>
-</li>
-<li><p>重启Sublime Text 3后再次打开之前中文乱码的文件发现，中文能够正常显示</p>
-</li>
-</ul>
-<h2 id="sublime-主题和字体"><a href="#sublime-主题和字体" class="headerlink" title="sublime 主题和字体"></a>sublime 主题和字体</h2><ul>
-<li><p>通过快捷键 Ctrl + shift + P ，然后在弹出的输入框输入 install，选择Package Control：install Package回车</p>
-</li>
-<li><p>在出现的插件命令行搜索Themes：ayu/edge  Font：Consoles</p>
+  <h2 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h2><ul>
+<li>首先进行配置文件的修改， _config.yml(不是主题配置文件)<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">post_asset_folder: <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<img src="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/1.png" alt="修改配置项"><h2 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-asset-image --save</span><br></pre></td></tr></table></figure>
+<img src="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/2.png" alt="install"><h2 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h2></li>
+<li>通过命令，创建一篇新的文章时候，自动在source/_post/新建对应文件名称的文件夹（为了避免有时候文章中并没有图片，可以手动创建md文件，需要图片在创建文件夹即可）<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new test.md</span><br></pre></td></tr></table></figure></li>
+<li>进入source/_post/下即可看到对应创建的文件和文件夹<h2 id="第四步"><a href="#第四步" class="headerlink" title="第四步"></a>第四步</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean  <span class="comment">#清除</span></span><br><span class="line">hexo ge    <span class="comment">#生成静态资源 ， 此时可以通过输出信息看到对应的图片名称信息，基本就完成了</span></span><br><span class="line">hexo s     <span class="comment">#本地查看是否生效</span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
  
@@ -186,12 +172,12 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2020/11/13/sublime%E9%85%8D%E7%BD%AE/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>  
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Sublime/" rel="tag">Sublime</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li></ul>
 
     </footer>
   </div>
@@ -199,19 +185,10 @@
    
   <nav class="article-nav">
     
-      <a href="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            Hexo_本地图片如何上传到Github
-          
-        </div>
-      </a>
     
-    
-      <a href="/2020/11/11/fb/" class="article-nav-link">
+      <a href="/2020/11/13/sublime%E9%85%8D%E7%BD%AE/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">FISCO BCOS - 01 - 入门</div>
+        <div class="article-nav-title">Sublime 乱码问题及插件安装</div>
       </a>
     
   </nav>
