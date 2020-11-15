@@ -76,7 +76,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">1.7k</span>
+            <span class="post-count">1.9k</span>
         </span>
     </span>
 
@@ -85,7 +85,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">7 min</span>
+            <span class="post-count">8 min</span>
         </span>
     </span>
 </div>
@@ -132,7 +132,13 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add . </span><br><span class="line">git commit -m <span class="string">&quot;add file !&quot;</span> </span><br><span class="line">git  commit -am <span class="string">&quot;add file !&quot;</span> </span><br></pre></td></tr></table></figure>
 </li>
 <li><p>2.其次再把本地仓库的代码提交到远程仓库上</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git  remote add origin git@github.com:ayxyj/ayxyj.github.io.git  <span class="comment">#添加远程仓库</span></span><br><span class="line">git push -u gocode master <span class="comment">#第一次提交到远程仓库的master分支上</span></span><br><span class="line">git push gocode master <span class="comment">#之后提交</span></span><br></pre></td></tr></table></figure></li>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git remote add gocode git@github.com:ayxyj/ayxyj.github.io.git  <span class="comment">#添加远程仓库</span></span><br><span class="line">git push -u gocode master <span class="comment">#第一次提交到远程仓库的master分支上</span></span><br><span class="line">git push gocode master <span class="comment">#之后提交</span></span><br></pre></td></tr></table></figure></li>
+<li><p>3.删除本地分支和远程分支</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git branch -d master <span class="comment">#删除本地分支、注意删除时候应该切换到其他分支才可以删除分支</span></span><br><span class="line">git push gocode --delete master <span class="comment">#删除远程仓库下的mater分支</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>4.合并本地分支和远程分支</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">基本流程</span><br><span class="line">0.查看远程仓库</span><br><span class="line">git remote -v</span><br><span class="line"></span><br><span class="line">1.本地创建一个与新分支并且关联远程分支</span><br><span class="line">git checkout -b dev gocode/dev </span><br><span class="line">这时 dev 已经和远程的 gocode/dev 一致了。</span><br><span class="line"></span><br><span class="line">同上1.查看到远程有一个叫gocode的仓库，我们可以使用如下命令从gocode远程仓库获取最新版本的代码。</span><br><span class="line">git fetch origin master:temp</span><br><span class="line">上面代码的意思是：从远程的gocode仓库的master分支下载到本地，并新建一个temp分支。</span><br><span class="line"></span><br><span class="line">2.查看temp分支与本地原有分支的不同</span><br><span class="line">git diff temp</span><br><span class="line"></span><br><span class="line">3. 切换回本地的 master 版本</span><br><span class="line">git checkout master </span><br><span class="line"></span><br><span class="line">4. 将本地的 dev 合并到 master</span><br><span class="line">git merge dev </span><br><span class="line"></span><br><span class="line">5. 将本地的 master 推到远程</span><br><span class="line">git push gocode master </span><br><span class="line"></span><br><span class="line">6. 将远程的 dev 版本删除</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>第二种方式在配置文件中配置远程仓库的地址（需要做ssh认证）</p>
 <ul>
 <li>生成ssh公私钥<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;aayxyj@163.com&quot;</span></span><br><span class="line">cat ~/.ssh/id_rsa.pub <span class="comment">#将查看到的公钥在github的个人设置中新建ssh密码填入即可</span></span><br></pre></td></tr></table></figure></li>
