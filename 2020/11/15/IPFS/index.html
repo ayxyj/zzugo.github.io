@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    Hexo_本地图片如何上传到Github |  Syraer&#39;s Blog
+    IPFS - 01 - 搭建 |  Syraer&#39;s Blog
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -46,7 +46,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-Hexo-本地图片-md"
+  id="post-IPFS"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -57,18 +57,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  Hexo_本地图片如何上传到Github
+  IPFS - 01 - 搭建
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/" class="article-date">
-  <time datetime="2020-11-13T09:49:25.000Z" itemprop="datePublished">2020-11-13</time>
+      <a href="/2020/11/15/IPFS/" class="article-date">
+  <time datetime="2020-11-15T01:56:11.000Z" itemprop="datePublished">2020-11-15</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/Hexo/">Hexo</a>
+    <a class="article-category-link" href="/categories/BlockChain/">BlockChain</a> / <a class="article-category-link" href="/categories/BlockChain/IPFS/">IPFS</a>
   </div>
   
 <div class="word_count">
@@ -76,7 +76,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">219</span>
+            <span class="post-count">391</span>
         </span>
     </span>
 
@@ -85,7 +85,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">1 min</span>
+            <span class="post-count">2 min</span>
         </span>
     </span>
 </div>
@@ -100,16 +100,30 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h2><ul>
-<li>首先进行配置文件的修改， _config.yml(不是主题配置文件)<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">post_asset_folder: <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-<img src="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/1.png" alt="修改配置项"><h2 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-asset-image --save</span><br></pre></td></tr></table></figure>
-<img src="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/2.png" alt="install"><h2 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h2></li>
-<li>通过命令，创建一篇新的文章时候，自动在source/_post/新建对应文件名称的文件夹（为了避免有时候文章中并没有图片，可以手动创建md文件，需要图片在创建文件夹即可）<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new test.md</span><br></pre></td></tr></table></figure></li>
-<li>进入source/_post/下即可看到对应创建的文件和文件夹<h2 id="第四步"><a href="#第四步" class="headerlink" title="第四步"></a>第四步</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean  <span class="comment">#清除</span></span><br><span class="line">hexo ge    <span class="comment">#生成静态资源 ， 此时可以通过输出信息看到对应的图片名称信息，基本就完成了</span></span><br><span class="line">hexo s     <span class="comment">#本地查看是否生效</span></span><br></pre></td></tr></table></figure>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2></li>
-<li>在md文件中，图片的路径可以写一下两种方式都可以load到图片的路径<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">![test1](./1.png)</span><br><span class="line">![test1](./<span class="built_in">test</span>/2.png)</span><br></pre></td></tr></table></figure>
+  <h2 id="一、安装IPFS"><a href="#一、安装IPFS" class="headerlink" title="一、安装IPFS"></a>一、安装IPFS</h2><pre><code>&gt; * 1.下载Centos或WIndows的安装包 </code></pre>
+<p><img src="/2020/11/15/IPFS/1604282306274.png" alt="1604282306274"></p>
+<ul>
+<li>2.上传并安装IPFS</li>
+</ul>
+<p><img src="/2020/11/15/IPFS/1604282593675.png" alt="1604282593675"></p>
+<ul>
+<li><p>3.解压并安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sh install.sh</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/11/15/IPFS/1604282679231.png" alt="1604282679231"></p>
 </li>
 </ul>
+<h2 id="二、测试IPFS"><a href="#二、测试IPFS" class="headerlink" title="二、测试IPFS"></a>二、测试IPFS</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ipfs  daemon   <span class="comment">#启动ipfs服务 加入IPFS网络</span></span><br><span class="line"></span><br><span class="line">ipfs </span><br></pre></td></tr></table></figure>
+<p><img src="/2020/11/15/IPFS/1604282697844.png" alt="1604282697844"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ipfs init </span><br><span class="line"></span><br><span class="line">ll -a ~/    //可以看到家目录下创建一个 .ipfs 文件夹</span><br><span class="line"></span><br><span class="line">ipfs cat /ipfs/QmQPeNsJPyVWPFDVHb77w8G42Fvo15z4bG2X8D2GhfbSXc/readme  //可以看到IPFS几个模块</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/11/15/IPFS/1604282774407.png" alt="1604282774407"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ipfs id </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/11/15/IPFS/1604282874036.png" alt="1604282874036"></p>
+<p>可以通过快速开始学习IPFS的基本操作</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line">[root@zzuxyj7 .ipfs]<span class="comment"># ipfs cat /ipfs/QmQPeNsJPyVWPFDVHb77w8G42Fvo15z4bG2X8D2GhfbSXc/quick-start</span></span><br><span class="line"><span class="comment"># 0.1 - Quick Start</span></span><br><span class="line"></span><br><span class="line">This is a <span class="built_in">set</span> of short examples with minimal explanation. It is meant as</span><br><span class="line">a <span class="string">&quot;quick start&quot;</span>.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Add a file to ipfs:</span><br><span class="line"></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;hello world&quot;</span> &gt;hello</span><br><span class="line">  ipfs add hello</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">View it:</span><br><span class="line"></span><br><span class="line">  ipfs cat &lt;the-hash-you-got-here&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Try a directory:</span><br><span class="line"></span><br><span class="line">  mkdir foo</span><br><span class="line">  mkdir foo/bar</span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;baz&quot;</span> &gt; foo/baz</span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;baz&quot;</span> &gt; foo/bar/baz</span><br><span class="line">  ipfs add -r foo</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">View things:</span><br><span class="line"></span><br><span class="line">  ipfs ls &lt;the-hash-here&gt;</span><br><span class="line">  ipfs ls &lt;the-hash-here&gt;/bar</span><br><span class="line">  ipfs cat &lt;the-hash-here&gt;/baz</span><br><span class="line">  ipfs cat &lt;the-hash-here&gt;/bar/baz</span><br><span class="line">  ipfs cat &lt;the-hash-here&gt;/bar</span><br><span class="line">  ipfs ls &lt;the-hash-here&gt;/baz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">References:</span><br><span class="line"></span><br><span class="line">  ipfs refs &lt;the-hash-here&gt;</span><br><span class="line">  ipfs refs -r &lt;the-hash-here&gt;</span><br><span class="line">  ipfs refs --<span class="built_in">help</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Get:</span><br><span class="line"></span><br><span class="line">  ipfs get &lt;the-hash-here&gt; -o foo2</span><br><span class="line">  diff foo foo2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Objects:</span><br><span class="line"></span><br><span class="line">  ipfs object get &lt;the-hash-here&gt;</span><br><span class="line">  ipfs object get &lt;the-hash-here&gt;/foo2</span><br><span class="line">  ipfs object --<span class="built_in">help</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Pin + GC:</span><br><span class="line"></span><br><span class="line">  ipfs pin add &lt;the-hash-here&gt;</span><br><span class="line">  ipfs repo gc</span><br><span class="line">  ipfs ls &lt;the-hash-here&gt;</span><br><span class="line">  ipfs pin rm &lt;the-hash-here&gt;</span><br><span class="line">  ipfs repo gc</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Daemon:</span><br><span class="line"></span><br><span class="line">  ipfs daemon  (<span class="keyword">in</span> another terminal)</span><br><span class="line">  ipfs id</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Network:</span><br><span class="line"></span><br><span class="line">  (must be online)</span><br><span class="line">  ipfs swarm peers</span><br><span class="line">  ipfs id</span><br><span class="line">  ipfs cat &lt;hash-of-remote-object&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Mount:</span><br><span class="line"></span><br><span class="line">  (warning: fuse is finicky!)</span><br><span class="line">  ipfs mount</span><br><span class="line">  <span class="built_in">cd</span> /ipfs/&lt;the-hash-here&gt;</span><br><span class="line">  ls</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Tool:</span><br><span class="line"></span><br><span class="line">  ipfs version</span><br><span class="line">  ipfs update</span><br><span class="line">  ipfs commands</span><br><span class="line">  ipfs config --<span class="built_in">help</span></span><br><span class="line">  open http://localhost:5001/webui</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Browse:</span><br><span class="line"></span><br><span class="line">  WebUI:</span><br><span class="line"></span><br><span class="line">    http://localhost:5001/webui</span><br><span class="line"></span><br><span class="line">  video:</span><br><span class="line"></span><br><span class="line">    http://localhost:8080/ipfs/QmVc6zuAneKJzicnJpfrqCH9gSy6bz54JhcypfJYhGUFQu/play<span class="comment">#/ipfs/QmTKZgRNwDNZwHtJSjCp6r5FYefzpULfy37JvMt9DwvXse</span></span><br><span class="line"></span><br><span class="line">  images:</span><br><span class="line"></span><br><span class="line">    http://localhost:8080/ipfs/QmZpc3HvfjEXvLWGQPWbHk3AjD5j8NEN4gmFN8Jmrd5g83/cs</span><br><span class="line"></span><br><span class="line">  markdown renderer app:</span><br><span class="line"></span><br><span class="line">    http://localhost:8080/ipfs/QmX7M9CiYXjVeFnkfVGf3y5ixTZ2ACeSGyL1vBJY1HvQPp/mdown</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
  
       <!-- reward -->
       
@@ -174,12 +188,12 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2020/11/15/IPFS/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>  
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BlockChain/" rel="tag">BlockChain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IPFS/" rel="tag">IPFS</a></li></ul>
 
     </footer>
   </div>
@@ -187,19 +201,10 @@
    
   <nav class="article-nav">
     
+    
       <a href="/2020/11/14/Geth_note/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            Geth_搭建私有链
-          
-        </div>
-      </a>
-    
-    
-      <a href="/2020/11/13/git/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Git基本用法</div>
+        <div class="article-nav-title">Geth_搭建私有链</div>
       </a>
     
   </nav>
