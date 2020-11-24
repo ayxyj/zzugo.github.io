@@ -147,6 +147,160 @@
     
     
     <article
+  id="post-docker_的私有registry"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/23/docker_%E7%9A%84%E7%A7%81%E6%9C%89registry/"
+    >Docker Registry - 搭建本地仓库并测试</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/23/docker_%E7%9A%84%E7%A7%81%E6%9C%89registry/" class="article-date">
+  <time datetime="2020-11-23T06:24:15.000Z" itemprop="datePublished">2020-11-23</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Docker/">Docker</a> / <a class="article-category-link" href="/categories/Docker/Registry/">Registry</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="搭建一个私有的docker-registry"><a href="#搭建一个私有的docker-registry" class="headerlink" title="搭建一个私有的docker registry"></a>搭建一个私有的docker registry</h1><p>找一台docker host，然后运行 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -v /opt/registry:/var/lib/registry -p 5000:5000 --restart=always --name registry registry:2</span><br></pre></td></tr></table></figure>
+
+<p>docker registry 绑定了到本地的80端口。 接下来我们配置DNS server，假如我们这台运行registry的机器地址是192.168.99.100,</p>
+<p>然后我们找到上次配置gitlab ci的那个dns container</p>
+<p>执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it dns-server &#x2F;bin&#x2F;sh</span><br></pre></td></tr></table></figure>
+
+<p>添加一条新的记录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F; # more &#x2F;etc&#x2F;dnsmasqhosts</span><br><span class="line">192.168.211.10 gitlab.example.com</span><br><span class="line">192.168.99.100 registry.example.com</span><br><span class="line">&#x2F; #</span><br></pre></td></tr></table></figure>
+
+<p>然后重启container</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker restart dns-server</span><br></pre></td></tr></table></figure>
+
+<p>最后我们去gitlab-ci服务器，ping一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[vagrant@gitlab-ci ~]$ ping registry.example.com</span><br><span class="line">PING registry.example.com (192.168.99.100) 56(84) bytes of data.</span><br><span class="line">64 bytes from registry.example.com (192.168.99.100): icmp_seq&#x3D;1 ttl&#x3D;63 time&#x3D;0.395 ms</span><br><span class="line">64 bytes from registry.example.com (192.168.99.100): icmp_seq&#x3D;2 ttl&#x3D;63 time&#x3D;0.537 ms</span><br><span class="line">64 bytes from registry.example.com (192.168.99.100): icmp_seq&#x3D;3 ttl&#x3D;63 time&#x3D;0.683 ms</span><br><span class="line">^C</span><br><span class="line">--- registry.example.com ping statistics ---</span><br><span class="line">3 packets transmitted, 3 received, 0% packet loss, time 2003ms</span><br><span class="line">rtt min&#x2F;avg&#x2F;max&#x2F;mdev &#x3D; 0.395&#x2F;0.538&#x2F;0.683&#x2F;0.119 ms</span><br><span class="line">[vagrant@gitlab-ci ~]$</span><br></pre></td></tr></table></figure>
+
+<p>成功。</p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>在gitlab-ci服务器上，编辑</p>
+<p>创建一个文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;docker&#x2F;daemon.json</span><br></pre></td></tr></table></figure>
+
+<p>然后写入内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[vagrant@gitlab-ci ~]$ sudo more &#x2F;etc&#x2F;docker&#x2F;daemon.json</span><br><span class="line">&#123; &quot;insecure-registries&quot;:[&quot;registry.example.com:5000&quot;] &#125;</span><br><span class="line">[vagrant@gitlab-ci ~]$</span><br></pre></td></tr></table></figure>
+
+<p>从docker hub拉取一个busybox，然后打一个tag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull busybox</span><br><span class="line">docker tag busybox registry.example.com:5000&#x2F;busybox</span><br></pre></td></tr></table></figure>
+
+<p>然后push到我们的私有registry里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[vagrant@gitlab-ci ~]$ docker push registry.example.com:5000&#x2F;busybox</span><br><span class="line">The push refers to repository [registry.example.com:5000&#x2F;busybox]</span><br><span class="line">c5183829c43c: Pushed</span><br><span class="line">latest: digest: sha256:c7b0a24019b0e6eda714ec0fa137ad42bc44a754d9cea17d14fba3a80ccc1ee4 size: 527</span><br><span class="line">[vagrant@gitlab-ci ~]$</span><br></pre></td></tr></table></figure>
+
+<p>成功。</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Registry/" rel="tag">Registry</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-docker-portainer"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/22/docker-portainer/"
+    >Docker Portainer - 安装并远程连接docker-WebUI</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/22/docker-portainer/" class="article-date">
+  <time datetime="2020-11-22T02:31:23.000Z" itemprop="datePublished">2020-11-22</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Docker/">Docker</a> / <a class="article-category-link" href="/categories/Docker/Portainer/">Portainer</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="Centos7远程访问系统中的docker-WebUI工具Portainer"><a href="#Centos7远程访问系统中的docker-WebUI工具Portainer" class="headerlink" title="Centos7远程访问系统中的docker-WebUI工具Portainer"></a>Centos7远程访问系统中的docker-WebUI工具Portainer</h2><p>首先获取portainer image </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull portainer/portainer</span><br></pre></td></tr></table></figure>
+
+<p>新建一个卷（portainer_data）来存Portainer数据</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker volume create portainer_data</span><br><span class="line">docker run -d -p 9000:9000 -p 8000:8000 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer </span><br><span class="line"></span><br><span class="line"><span class="comment">#第二种本地存储</span></span><br><span class="line">docker run -d --restart=always -p 9000:9000 -v /root/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name dev-portainer portainer/portainer</span><br></pre></td></tr></table></figure>
+
+<p>修改将要被远程连接的客户机的docker.service 文件开通docker的远程管理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim /lib/systemd/system/docker.service</span><br><span class="line">ExecStart=/usr/bin/dockerd -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375</span><br></pre></td></tr></table></figure>
+
+<p>重启客户机docker</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload </span><br><span class="line">systemctl restart docker</span><br></pre></td></tr></table></figure>
+
+<p>关闭客户机防火墙</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">查看防火墙状态： systemctl status firewalld.service  <span class="comment">#绿的running表示防火墙开启</span></span><br><span class="line"></span><br><span class="line">执行关闭命令： systemctl stop firewalld.service</span><br><span class="line"></span><br><span class="line">再次执行查看防火墙命令：systemctl status firewalld.service</span><br><span class="line"></span><br><span class="line">执行开机禁用防火墙自启命令  ： systemctl <span class="built_in">disable</span> firewalld.service</span><br></pre></td></tr></table></figure>
+
+<p>查看端口信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ss -ntpl</span><br><span class="line"><span class="comment">#存在2375即可访问</span></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Portainer/" rel="tag">Portainer</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-solidity-02"
   class="article article-type-post"
   itemscope
@@ -989,264 +1143,14 @@
 </article>
 
     
-    <article
-  id="post-markdown"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/01/23/markdown/"
-    >MarkDown语法</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/01/23/markdown/" class="article-date">
-  <time datetime="2019-01-23T13:57:00.000Z" itemprop="datePublished">2019-01-23</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Markdown/">Markdown</a>
-  </div>
-   
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h3 id="一、字体"><a href="#一、字体" class="headerlink" title="一、字体"></a>一、字体</h3><pre><code>加粗 ： ** 粗 **
-斜体 ： * 斜体 *
-粗斜 ： *** T ***
-删除线： ~~ D ~~</code></pre>
-<h3 id="二、标题"><a href="#二、标题" class="headerlink" title="二、标题"></a>二、标题</h3><pre><code>#   ： 一级标题
-##  ： 二级标题
-### ： 三级标题
-。。。 以此类推</code></pre>
-<h3 id="三、引用"><a href="#三、引用" class="headerlink" title="三、引用"></a>三、引用</h3><pre><code>&gt;    : 引用
-&gt;&gt;   : 嵌套引用
-&gt;&gt;&gt;  : 再次嵌套引用
-&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; n次嵌套  :   n次嵌套</code></pre>
-<h3 id="四、分割线"><a href="#四、分割线" class="headerlink" title="四、分割线"></a>四、分割线</h3><pre><code> * 或者 - 三个或者三个以上即可
- * 例如：
-   * ---
-   * ***</code></pre>
-<h3 id="五、图片"><a href="#五、图片" class="headerlink" title="五、图片"></a>五、图片</h3><pre><code>语法：
-    ![img alt](img address &quot;img title&quot;)
-    注：
-        img alt : 图片下方的文字，如 图1所示
-        img address ： 图片的绝对路径
-        ing title   :  图片的标题
-
-  例：
-      ![AYXYJ](https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=702257389,1274025419&amp;fm=27&amp;gp=0.jpg &quot;TEST&quot;)</code></pre>
-<h3 id="六、超链接"><a href="#六、超链接" class="headerlink" title="六、超链接"></a>六、超链接</h3><pre><code>语法：
-    [超链接名](超链接地址 &quot;超链接title&quot;)
-
-  例：
-      [简书](http://jianshu.com)
-      [AYXYJ](http://ayxyj.cn)
-
-注：MarkDown本身语法不支持超链接在新页面打开，貌似简书做了处理，是可以的，别的平台可能不行。
-如果想要在新页面中打开的话可以用html语言的a标签代替。
-
-  例：
-     &lt;a href = &quot;超链接地址&quot; target=“_blank”&gt;超链接title&lt;/a&gt;
-     &lt;a href=&quot;https://www.jianshu.com/u/1f5ac0cf6a8b&quot; target=&quot;_blank&quot;&gt;简书&lt;/a&gt;</code></pre>
-<h3 id="七、列表"><a href="#七、列表" class="headerlink" title="七、列表"></a>七、列表</h3><pre><code>语法：
-    -无序列表： - + * 都可以
-
-    例：
-        - AYXYJ :注意 - 和 ayxyj有一个空格
-
-    1.有序列表： 数字加点
-
-    例：
-         1. AYXYJ :序号和内容之间要有空格
-
-    - 列表无序嵌套
-    -    上下级之间敲三个空格即可
-
-    1. 列表有序嵌套
-    2.    上下级之间敲三个空格即可</code></pre>
-<h3 id="八、表格"><a href="#八、表格" class="headerlink" title="八、表格"></a>八、表格</h3><pre><code>语法：
-    表头|表头|表头
-    ---|:---:|---:
-    内容|内容|内容
-
-注：
-    第二行分割表头和内容： - 有一个即可，为了对其，多加了几个
-    - 文字默认局左
-    - 两边加 ： 表示文字居中
-    - 右边加 ： 表示文字居右
-    -   原生的语法两边都要 | 包起来，此处省略
-
-例：
-    姓名|性别|TAG
-    ---|:---:|---:
-    xyj|male|20
-    syl|female|20</code></pre>
-<h3 id="九、代码"><a href="#九、代码" class="headerlink" title="九、代码"></a>九、代码</h3><pre><code>语法：
-    - 单行代码： 代码之间用 ` 代码 ` ：反引号
-
-    - 代码块 : 代码之间分别用三个反引包起来，且两边反引号独占一行   </code></pre>
-<h3 id="十、流程图"><a href="#十、流程图" class="headerlink" title="十、流程图"></a>十、流程图</h3><pre><code>语法：
-    flow
-    st=&gt;start: start
-    op=&gt;operation: my operation
-    cond=&gt;condition: Yes or No?
-    e=&gt;end
-    st-&gt;op-&gt;cond
-    cond(yes)-&gt;e
-    cond(no)-&gt;op
-    &amp;
-    ```</code></pre>
-<h2 id="宝剑锋从磨砺出，梅花香自苦寒来"><a href="#宝剑锋从磨砺出，梅花香自苦寒来" class="headerlink" title="宝剑锋从磨砺出，梅花香自苦寒来~"></a>宝剑锋从磨砺出，梅花香自苦寒来~</h2> 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-快速搭建Hexo博客"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2018/11/08/%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2/"
-    >快速搭建Hexo博客</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2018/11/08/%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2/" class="article-date">
-  <time datetime="2018-11-08T02:38:59.000Z" itemprop="datePublished">2018-11-08</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Hexo/">Hexo</a>
-  </div>
-   
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <blockquote>
-<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
-</blockquote>
-<ul>
-<li>由于我的环境是Linux，所以Linux环境的按着来就好了，Win环境大同小异。<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo手册</a><h2 id="一、安装基本环境"><a href="#一、安装基本环境" class="headerlink" title="一、安装基本环境"></a>一、安装基本环境</h2><h4 id="1-安装Git"><a href="#1-安装Git" class="headerlink" title="1. 安装Git"></a>1. 安装Git</h4></li>
-<li>Git 是目前比较流行的分布式版本控制系统，我们使用它与github进行交互下载对应版本的的git安装就好，下载地址 <a target="_blank" rel="noopener" href="https://gitforwindows.org/">git_download</a>，装后打开Git Bash     <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git --version   <span class="comment">#可以查看版本号</span></span><br></pre></td></tr></table></figure>
-<img src="https://img-blog.csdnimg.cn/20201106091003662.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><h4 id="2-安装Node-js"><a href="#2-安装Node-js" class="headerlink" title="2. 安装Node.js"></a>2. 安装Node.js</h4><blockquote>
-<p>Node.js是一个Javascript运行环境，是一个让 JavaScript 运行在服务端的开发平台，我们用来快速生成博客的静态页面，LTS版本为长期支持版，CURRENT版本为最新版，任选一个正常安装即可下载地址<a target="_blank" rel="noopener" href="https://nodejs.org/en/">Node.js_download</a>。</p>
-</blockquote>
-</li>
-</ul>
-<h2 id="二、开始本地搭建博客"><a href="#二、开始本地搭建博客" class="headerlink" title="二、开始本地搭建博客"></a>二、开始本地搭建博客</h2><h4 id="1-新建本地文件夹"><a href="#1-新建本地文件夹" class="headerlink" title="1. 新建本地文件夹"></a>1. 新建本地文件夹</h4><ul>
-<li><p> 在本地新建一个文件夹用来储存我们的博客，Git Bash进入文件夹下，执行命令：<code>npm install hexo -g </code>用来安装hexo</p>
-<h4 id="2-搭建本地服务"><a href="#2-搭建本地服务" class="headerlink" title="2. 搭建本地服务"></a>2. 搭建本地服务</h4></li>
-<li><p>依次在本地文件夹根目录下执行以下命令初始化并生成服务。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo init    <span class="comment"># 初始化</span></span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/20201106101536428.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm isntall    <span class="comment"># 安装npm依赖包 </span></span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/2020110610155695.png#pic_center" alt="在这里插入图片描述"></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo generate   <span class="comment"># 生成静态网页</span></span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/202011061016167.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-</li>
-<li><p>全部执行成功后浏览器访问<a href="http://localhost:4000,如果出现默认的hexo博客，那么我们本地搭建博客就完成了">http://localhost:4000,如果出现默认的hexo博客，那么我们本地搭建博客就完成了</a></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo server    <span class="comment"># 生成本地服务</span></span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/2020110610170823.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-</li>
-</ul>
-<h2 id="三、本地博客发布到网络上"><a href="#三、本地博客发布到网络上" class="headerlink" title="三、本地博客发布到网络上"></a>三、本地博客发布到网络上</h2><h4 id="1-创建Github远程仓库"><a href="#1-创建Github远程仓库" class="headerlink" title="1.创建Github远程仓库"></a>1.创建Github远程仓库</h4><ul>
-<li><p> 这里我们就要用到github了。有账户的可以略过，没有账户的新建账户，并登录。新建一个仓库，仓库名格式设置为：xxxx.github.io,其他可以不动。<br><img src="https://img-blog.csdnimg.cn/20201106104319159.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-</li>
-<li><p>之后我们就可以到如下界面，记录ssh的地址<br><img src="https://img-blog.csdnimg.cn/2020110610435326.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-</li>
-<li><p>在更改本地目录下的_config.yml配置文件，最后加上.</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repo: 这里填刚记录的ssh地址</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/2020110610462925.png#pic_center" alt="config"></p>
-</li>
-</ul>
-<h4 id="2-将Hexo与-Github连接"><a href="#2-将Hexo与-Github连接" class="headerlink" title="2. 将Hexo与 Github连接"></a>2. 将Hexo与 Github连接</h4><ul>
-<li>按照如下格式输入，在本地创建git用户名和邮箱进行并生成ssh密钥<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">&quot;yourname&quot;</span></span><br><span class="line">git config --global user.email <span class="string">&quot;youremail&quot;</span></span><br><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;youremail&quot;</span></span><br></pre></td></tr></table></figure>
-<img src="https://img-blog.csdnimg.cn/20201106095702217.png#pic_center" alt="config_list"></li>
-<li>接下来我们把生成的id_rsa.pub文件用文本编辑器打开，复制里面的内容绑定到GitHub上，标题随意。</li>
-<li>点击新建ssh keys，title随便填，key填写id_rsa.pub的内容即可，应该会要求输入密码<br>测试是否成功<br><img src="https://img-blog.csdnimg.cn/20201106101959180.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com   <span class="comment">#注意这里的地址不用改</span></span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/20201106102109417.png#pic_center" alt="在这里插入图片描述"></p>
-<ul>
-<li>提示Are you sure you want to continue connecting (yes/no)?时输入yes</li>
-<li>当看到Hi Budtit! You’ve successfully authenticated, but GitHub does not provide shell access.时说明配置成功<img src="https://img-blog.csdnimg.cn/20201106101343397.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
-</ul>
-<h4 id="3-部署到github"><a href="#3-部署到github" class="headerlink" title="3. 部署到github"></a>3. 部署到github</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如果报错说not found git 我们执行以下命令：<code>npm install hexo-deployer-git --save</code>安装插件，然后在执行上一步命令第一次部署应该会让登录，浏览<code>yourname.github.io</code>成功显示博客页<img src="https://img-blog.csdnimg.cn/20201106103507617.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
-<li>上面在配置branch时候我写的Master，可以自己新建分支，专门用于存放blog<br><img src="https://img-blog.csdnimg.cn/2020110610360953.png#pic_center" alt="在这里插入图片描述"><h2 id="四、写作并上传第一篇博客"><a href="#四、写作并上传第一篇博客" class="headerlink" title="四、写作并上传第一篇博客"></a>四、写作并上传第一篇博客</h2><h4 id="1-写作"><a href="#1-写作" class="headerlink" title="1. 写作"></a>1. 写作</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new [layout] &lt;title&gt;  <span class="comment">#创建新文章</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>创建后会在本地目录生成测试.md文件，用markdown语法编辑文件后保存，建议每次写作后本地部署完成进入<a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000</a> 查看无误后再上传。<br>hexo server    # 本地服务部署  可简写为hexo s</p>
-<h4 id="2-上传"><a href="#2-上传" class="headerlink" title="2. 上传"></a>2. 上传</h4><p>依次执行命令，hexo的具体用法请查看官方文档 戳这里</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean    <span class="comment"># 清除缓存</span></span><br><span class="line">hexo generate   <span class="comment"># 生成静态页面  可简写为hexo g</span></span><br><span class="line">hexo deploy	   <span class="comment"># 部署博客  可简写为hexo d</span></span><br></pre></td></tr></table></figure>
-<p><img src="https://img-blog.csdnimg.cn/20201106104810832.png#pic_center" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20201106104821899.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTUzMTU0OQ==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
-<h2 id="五、解析私人域名"><a href="#五、解析私人域名" class="headerlink" title="五、解析私人域名"></a>五、解析私人域名</h2><ul>
-<li>这里就要买域名了，添加两条记录</li>
-<li>然后在本地博客目录下的source文件夹下新建名为CNAME的文件，其中写入域名</li>
-<li>最后在github库中的setting中的Custom domain下填写购买的域名,save保存。<br><img src="https://img-blog.csdnimg.cn/20201106104916393.png#pic_center" alt="domain"><br>好了，域名配置完成。</li>
-</ul>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
+  
+  <nav class="page-nav">
+    
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
+  </nav>
   
 </section>
 </div>
