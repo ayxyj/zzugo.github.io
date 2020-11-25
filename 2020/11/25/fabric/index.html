@@ -64,8 +64,8 @@
     </header>
      
     <div class="article-meta">
-      <a href="/2020/11/22/fabric/" class="article-date">
-  <time datetime="2020-11-22T02:31:23.000Z" itemprop="datePublished">2020-11-22</time>
+      <a href="/2020/11/25/fabric/" class="article-date">
+  <time datetime="2020-11-25T02:31:23.000Z" itemprop="datePublished">2020-11-25</time>
 </a> 
   <div class="article-category">
     <a class="article-category-link" href="/categories/Blockchain/">Blockchain</a> / <a class="article-category-link" href="/categories/Blockchain/Hyperledger-Fabric/">Hyperledger Fabric</a>
@@ -135,27 +135,27 @@
 <h3 id="下载过程比较漫长，因为采用的是docker镜像容器进行安装，需要下载所需要的镜像，我这里面拉取了所有的镜像，很多暂时不用（2-x不支持kafka-zookeeper）"><a href="#下载过程比较漫长，因为采用的是docker镜像容器进行安装，需要下载所需要的镜像，我这里面拉取了所有的镜像，很多暂时不用（2-x不支持kafka-zookeeper）" class="headerlink" title="下载过程比较漫长，因为采用的是docker镜像容器进行安装，需要下载所需要的镜像，我这里面拉取了所有的镜像，很多暂时不用（2.x不支持kafka,zookeeper）"></a>下载过程比较漫长，因为采用的是docker镜像容器进行安装，需要下载所需要的镜像，我这里面拉取了所有的镜像，很多暂时不用（2.x不支持kafka,zookeeper）</h3><ul>
 <li>脚本执行结束后，可以看到相关镜像等其他信息，如果存在没有拉取完的镜像，就在执行一边。</li>
 </ul>
-<p><img src="/2020/11/22/fabric/2.png" alt="2"></p>
+<p><img src="/2020/11/25/fabric/2.png" alt="2"></p>
 <ul>
 <li>通过docker查看拉取的镜像信息<code>docker image ls -a</code></li>
 </ul>
-<p><img src="/2020/11/22/fabric/3.png" alt="3"></p>
+<p><img src="/2020/11/25/fabric/3.png" alt="3"></p>
 <p>执行完如上图，另外在scripts目录下会多出来一个fabric-samples目录</p>
 <h2 id="三、启动test-network测试网络"><a href="#三、启动test-network测试网络" class="headerlink" title="三、启动test-network测试网络"></a>三、启动test-network测试网络</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /fabric-samples/test-network</span><br><span class="line">network.sh up</span><br></pre></td></tr></table></figure>
 
 <p>如下图，表示启动成功，已启动一个orderer节点和两个peer节点。</p>
-<p><img src="/2020/11/22/fabric/4.png" alt="4"></p>
+<p><img src="/2020/11/25/fabric/4.png" alt="4"></p>
 <p>可以查看本地启动的docker container 存在测试网络启动的oder和peer</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker ps -a  <span class="comment">#查看启动的container</span></span><br><span class="line">docker container ls -a <span class="comment">#查看启动的container</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="/2020/11/22/fabric/5.png" alt="5"></p>
+<p><img src="/2020/11/25/fabric/5.png" alt="5"></p>
 <h2 id="四、使用测试网络"><a href="#四、使用测试网络" class="headerlink" title="四、使用测试网络"></a>四、使用测试网络</h2><ul>
 <li>创建channel，使用network.sh脚本创建来创建一个连接org1和org2组织并加入他们peer的通道，命令如下：</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh createChannel</span><br></pre></td></tr></table></figure>
 
-<p><img src="/2020/11/22/fabric/6.png" alt="6"></p>
-<p><img src="/2020/11/22/fabric/7.png" alt="7"></p>
+<p><img src="/2020/11/25/fabric/6.png" alt="6"></p>
+<p><img src="/2020/11/25/fabric/7.png" alt="7"></p>
 <p>如上图，创建成功（默认通道名为mychannel）。</p>
 <p>也可以带上channel标签，命令如下（-c channelName）：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh createChannel -c channel1</span><br></pre></td></tr></table></figure>
@@ -174,7 +174,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh deployCC -l java</span><br></pre></td></tr></table></figure>
 
 <p>如图，启动成功：</p>
-<p><img src="/2020/11/22/fabric/8.png" alt="8"></p>
+<p><img src="/2020/11/25/fabric/8.png" alt="8"></p>
 <ul>
 <li>与网络互动</li>
 </ul>
@@ -194,7 +194,7 @@
 
 <h2 id="五、关闭网络"><a href="#五、关闭网络" class="headerlink" title="五、关闭网络"></a>五、关闭网络</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh down</span><br></pre></td></tr></table></figure>
 
-<p><img src="/2020/11/22/fabric/10.png" alt="10"></p>
+<p><img src="/2020/11/25/fabric/10.png" alt="10"></p>
 <h3 id="启动过程详解"><a href="#启动过程详解" class="headerlink" title="启动过程详解"></a>启动过程详解</h3><ul>
 <li><code>./network.sh</code>为两个peer节点和一个order节点创建了证书和密钥，默认情况下，脚本会利用在organizations/cryptogen文件夹下的加密工具。</li>
 <li>脚本利用configtxgen工具创建了系统的创世块，它使用<code>configtx/configtx.yaml</code>文件来创建创世块，并存储在system-genesis-block文件夹中。</li>
@@ -203,10 +203,10 @@
 <li>如果运行了deployCC命令，脚本会在所有peers上运行script下的<code>deployCC.sh</code>脚本来安装fabcar chaincode，在chaincode的定义被提交到channel之后，peer命令会调用init函数来初始化chaincode，并将所需的数据放入chaincode中。</li>
 </ul>
 <p>注：下图是fabric简化交易过程</p>
-<p><img src="/2020/11/22/fabric/11.png" alt="11"></p>
+<p><img src="/2020/11/25/fabric/11.png" alt="11"></p>
 <h2 id="六、标志并启动网络（ca为网络的标志）"><a href="#六、标志并启动网络（ca为网络的标志）" class="headerlink" title="六、标志并启动网络（ca为网络的标志）"></a>六、标志并启动网络（ca为网络的标志）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh up -ca</span><br></pre></td></tr></table></figure>
 
-<p><img src="/2020/11/22/fabric/Users/AYXYJ/Desktop/fabric/hyperledger%20fabric%20note/fabric/12.png" alt="标志并启动网络"></p>
+<p><img src="/2020/11/25/fabric/Users/AYXYJ/Desktop/fabric/hyperledger%20fabric%20note/fabric/12.png" alt="标志并启动网络"></p>
  
       <!-- reward -->
       
@@ -271,7 +271,7 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2020/11/22/fabric/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2020/11/25/fabric/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -284,19 +284,10 @@
    
   <nav class="article-nav">
     
-      <a href="/2020/11/22/docker-portainer/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            Docker Portainer - 安装并远程连接docker-WebUI
-          
-        </div>
-      </a>
     
-    
-      <a href="/2020/11/18/solidity-02/" class="article-nav-link">
+      <a href="/2020/11/23/docker_%E7%9A%84%E7%A7%81%E6%9C%89registry/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Solidity - 02 - 基本语法</div>
+        <div class="article-nav-title">Docker Registry - 搭建本地仓库并测试</div>
       </a>
     
   </nav>
