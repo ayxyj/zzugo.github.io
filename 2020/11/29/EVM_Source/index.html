@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-     Syraer&#39;s Blog
+    以太坊源码分析 - 交易源码分析 |  Syraer&#39;s Blog
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -53,17 +53,30 @@
   data-scroll-reveal
 >
   <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  以太坊源码分析 - 交易源码分析
+</h1>
+ 
+
+    </header>
      
     <div class="article-meta">
       <a href="/2020/11/29/EVM_Source/" class="article-date">
-  <time datetime="2020-11-29T10:44:14.270Z" itemprop="datePublished">2020-11-29</time>
-</a>   
+  <time datetime="2020-11-29T09:22:14.000Z" itemprop="datePublished">2020-11-29</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/BlockChain/">BlockChain</a> / <a class="article-category-link" href="/categories/BlockChain/EVM/">EVM</a>
+  </div>
+  
 <div class="word_count">
     <span class="post-time">
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">5.9k</span>
+            <span class="post-count">5.8k</span>
         </span>
     </span>
 
@@ -87,14 +100,7 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <p>title: 以太坊源码分析 - 交易源码分析<br>date: 2020-11-29 17:22:14<br>tags:</p>
-<ul>
-<li>BlockChain</li>
-<li>EVM<br>categories: </li>
-<li>BlockChain</li>
-<li>EVM</li>
-</ul>
-<p><strong>目录</strong></p>
+  <p><strong>目录</strong></p>
 <p><a href>一 . 发起交易</a></p>
 <p><a href>1. 发送交易时参数的机构体对象</a></p>
 <p><a href>2. SendTransaction（）方法介绍</a></p>
@@ -241,7 +247,8 @@
 <li>设置更新交易的nonce</li>
 <li>最后调用grpc接口，将交易广播到其他节点</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(pool *TxPool)</span> <span class="title">promoteTx</span><span class="params">(addr common.Address, hash common.Hash, tx *types.Transaction)</span></span> &#123;</span><br><span class="line">	<span class="comment">// Try to insert the transaction into the pending queue</span></span><br><span class="line">	<span class="keyword">if</span> pool.pending[addr] == <span class="literal">nil</span> &#123;</span><br><span class="line">		pool.pending[addr] = newTxList(<span class="literal">true</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	list := pool.pending[addr]</span><br><span class="line">	inserted, old := list.Add(tx, pool.config.PriceBump)</span><br><span class="line">	<span class="keyword">if</span> !inserted &#123;</span><br><span class="line">		<span class="comment">// An older transaction was better, discard this</span></span><br><span class="line">		<span class="built_in">delete</span>(pool.all, hash)</span><br><span class="line">		pool.priced.Removed()</span><br><span class="line">		pendingDiscardCounter.Inc(<span class="number">1</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Otherwise discard any previous transaction and mark this</span></span><br><span class="line">	<span class="keyword">if</span> old != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">delete</span>(pool.all, old.Hash())</span><br><span class="line">		pool.priced.Removed()</span><br><span class="line">		pendingReplaceCounter.Inc(<span class="number">1</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Failsafe to work around direct pending inserts (tests)</span></span><br><span class="line">	<span class="keyword">if</span> pool.all[hash] == <span class="literal">nil</span> &#123;</span><br><span class="line">	pool.all[hash] = tx</span><br><span class="line">	pool.priced.Put(tx)</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Set the potentially new pending nonce and notify any subsystems of the new tx</span></span><br><span class="line">	pool.beats[addr] = time.Now()</span><br><span class="line">	pool.pendingState.SetNonce(addr, tx.Nonce()+<span class="number">1</span>)</span><br><span class="line">	<span class="keyword">go</span> pool.txFeed.Send(TxPreEvent&#123;tx&#125;)</span><br></pre></td></tr></table></figure> 
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(pool *TxPool)</span> <span class="title">promoteTx</span><span class="params">(addr common.Address, hash common.Hash, tx *types.Transaction)</span></span> &#123;</span><br><span class="line">	<span class="comment">// Try to insert the transaction into the pending queue</span></span><br><span class="line">	<span class="keyword">if</span> pool.pending[addr] == <span class="literal">nil</span> &#123;</span><br><span class="line">		pool.pending[addr] = newTxList(<span class="literal">true</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	list := pool.pending[addr]</span><br><span class="line">	inserted, old := list.Add(tx, pool.config.PriceBump)</span><br><span class="line">	<span class="keyword">if</span> !inserted &#123;</span><br><span class="line">		<span class="comment">// An older transaction was better, discard this</span></span><br><span class="line">		<span class="built_in">delete</span>(pool.all, hash)</span><br><span class="line">		pool.priced.Removed()</span><br><span class="line">		pendingDiscardCounter.Inc(<span class="number">1</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Otherwise discard any previous transaction and mark this</span></span><br><span class="line">	<span class="keyword">if</span> old != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">delete</span>(pool.all, old.Hash())</span><br><span class="line">		pool.priced.Removed()</span><br><span class="line">		pendingReplaceCounter.Inc(<span class="number">1</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Failsafe to work around direct pending inserts (tests)</span></span><br><span class="line">	<span class="keyword">if</span> pool.all[hash] == <span class="literal">nil</span> &#123;</span><br><span class="line">	pool.all[hash] = tx</span><br><span class="line">	pool.priced.Put(tx)</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Set the potentially new pending nonce and notify any subsystems of the new tx</span></span><br><span class="line">	pool.beats[addr] = time.Now()</span><br><span class="line">	pool.pendingState.SetNonce(addr, tx.Nonce()+<span class="number">1</span>)</span><br><span class="line">	<span class="keyword">go</span> pool.txFeed.Send(TxPreEvent&#123;tx&#125;)</span><br></pre></td></tr></table></figure>
+ 
       <!-- reward -->
       
     </div>
@@ -310,16 +317,27 @@
 </div>
 
 <div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BlockChain/" rel="tag">BlockChain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/EVM/" rel="tag">EVM</a></li></ul>
+
     </footer>
   </div>
 
    
   <nav class="article-nav">
     
-    
       <a href="/2020/11/29/Geth_note/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Geth_搭建私有链
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2020/11/25/fabric/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Geth_搭建私有链</div>
+        <div class="article-nav-title">Hyperledger Fabric - 01 - 安装并测试网络</div>
       </a>
     
   </nav>
