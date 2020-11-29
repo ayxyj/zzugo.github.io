@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="一枚小菜鸡~" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    Geth_搭建私有链 |  Syraer&#39;s Blog
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-Geth_note"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Geth_搭建私有链
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/29/Geth_note/" class="article-date">
+  <time datetime="2020-11-29T10:32:14.000Z" itemprop="datePublished">2020-11-29</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/BlockChain/">BlockChain</a> / <a class="article-category-link" href="/categories/BlockChain/Geth/">Geth</a> / <a class="article-category-link" href="/categories/BlockChain/Geth/MetaMask/">MetaMask</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">3.6k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">16 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>MetaMask_pass:spot raccoon network sweet feel song knee put just uncover news audit //我的MetaMask助记词 ；可以直接用Remix-IDE连接geth，也可以通过MetaMask连接Geth，这样MetaMask帮助你实现r s v ，不用自己去弄！</p>
+<p>Geth客户端：<a target="_blank" rel="noopener" href="https://geth.ethereum.org/downloads/">Geth_download</a></p>
+<h3 id="Part0-MetaMask"><a href="#Part0-MetaMask" class="headerlink" title="Part0 MetaMask"></a>Part0 MetaMask</h3><p><img src="/2020/11/29/Geth_note/1606643269702.png" alt="1"></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#通过MetaMask连接本地Geth或者Ganache搭建的私有链或者TestRPC等都可以，这样会比较方便查看部署的合约和交易信息，而且更贴合实际操作。</span><br><span class="line">#如果不想搭建私有链，可以通过测试网络去部署合约和交易也是可以的，但是首先需要从对应的测试网络水龙头获取ether操作及之后测试需要科学上网。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>在本地通过npm安装一个remixd，这样可以实时将本地和浏览器代码同步，方便存储代码。<code>npm install remixd -g</code></p>
+<p><img src="/2020/11/29/Geth_note/1606643713320.png" alt="2"></p>
+</li>
+<li><p>部署合约和测试合约</p>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#智能合约</span><br><span class="line">#Solidity编译器是solc，通过remix-ide编写合约时候，注意solc的版本  </span><br><span class="line">#pragma solidity &gt;<span class="number">0.6</span><span class="number">.2</span> 也可以，当版本出现错误时候，可以尝试改变编译版本</span><br><span class="line">pragma solidity ^<span class="number">0.6</span><span class="number">.2</span>;</span><br><span class="line"></span><br><span class="line">contract Test&#123;</span><br><span class="line">    <span class="comment">//contract balance</span></span><br><span class="line">    uint public  money  ;</span><br><span class="line">    <span class="comment">//在remix中修改value 运行paly，金额就转到合约当中去了，然后通过transfer转到其他账户中去</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">paly</span>(<span class="params"></span>) <span class="title">public</span> <span class="title">payable</span></span>&#123;</span><br><span class="line">        money = msg.value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//contract balance </span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getBalance</span>(<span class="params"></span>) <span class="title">public</span> <span class="title">view</span> <span class="title">returns</span>(<span class="params">uint256</span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> address(<span class="built_in">this</span>).balance;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    address payable addr =  <span class="number">0x78662A9CFfFc852cF61a5c6c637cFB93f1c59397</span>;</span><br><span class="line">    <span class="comment">//transfer who ,who call </span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">transfer</span>(<span class="params">uint i </span>) <span class="title">public</span> <span class="title">payable</span>  </span>&#123;</span><br><span class="line">        addr.transfer ( i * <span class="number">10</span> ** <span class="number">18</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>接种编写合约的方式</p>
+<ul>
+<li>VS code IDE,代码编写,基本的语法检查.</li>
+<li>Remix IDE,简单代码编译运行看结果.方便学习.</li>
+<li>Truffle 环境,生产环境,较为复杂的代码编译部署.</li>
+</ul>
+</li>
+<li><p>ENVIRONMENT</p>
+<ul>
+<li>JavaScriptVM<ul>
+<li>该方式环境是将合约部署到浏览器的Solidity编译环境，可以在内存中模拟合约,直接运行,而不需要部署等复杂流程,适合入门学习.</li>
+</ul>
+</li>
+<li>Injected Web3<ul>
+<li>该方式可以连接到MetaMask.</li>
+</ul>
+</li>
+<li>Web3 Provider<ul>
+<li>该方式通过本地私有网络的rpc端口,链接到本地私有网络进行调试.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Deployed Contracts</p>
+<ul>
+<li>可以看到已经部署的合约，此时就可以看到在合约中写的相应get-set函数和public的状态变量;</li>
+<li>可以进行智能合约回调，当且只有产生新的数据才会发生交易，否则仅仅是调用，而不会产生新的交易区块.</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2020/11/29/Geth_note/1606643984807.png" alt="3"></p>
+<h3 id="Part1-Geth入门"><a href="#Part1-Geth入门" class="headerlink" title="Part1 Geth入门"></a>Part1 Geth入门</h3><ul>
+<li>创世块</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;config&quot;</span>: &#123;</span><br><span class="line">	<span class="attr">&quot;chainId&quot;</span>: <span class="number">15</span></span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="attr">&quot;difficulty&quot;</span>: <span class="string">&quot;2000&quot;</span>,</span><br><span class="line">	<span class="attr">&quot;gasLimit&quot;</span>: <span class="string">&quot;2100000&quot;</span>,</span><br><span class="line">	<span class="attr">&quot;alloc&quot;</span>: &#123;</span><br><span class="line">		<span class="attr">&quot;7df9a875a174b3bc565e6424a0050ebc1b2d1d82&quot;</span>: &#123; <span class="attr">&quot;balance&quot;</span>: <span class="string">&quot;300000000000000000000&quot;</span> &#125;,</span><br><span class="line">		<span class="attr">&quot;f41c74c9ae680c1aa78f42e5647a62f353b7bdde&quot;</span>: &#123; <span class="attr">&quot;balance&quot;</span>: <span class="string">&quot;400000000000000000000&quot;</span> &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>初始化创世快</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">D:\gethData&gt;geth --datadir . init genesis.json</span><br><span class="line">	此时在testGeth目录下会生成data目录，data目录又包含geth和keystore目录，geth目录存储区块数据，keystore目录则保存账户信息。</span><br><span class="line">	--init #根据genesis.json文件初始化创世区块</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动geth并开启远程RPC然后log输出到output.log里面</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">D:\gethData&gt;geth --datadir ./data0/ --rpc --rpccorsdomain <span class="string">&quot;*&quot;</span> --rpcaddr <span class="string">&quot;0.0.0.0&quot;</span> --rpcapi <span class="string">&quot;personal,admin,miner,db,eth,net,web3&quot;</span> --ipcdisable  --nodiscover  --allow-insecure-unlock --networkid 15 console 2&gt;&gt; output.log</span><br><span class="line">D:\gethData&gt;geth --datadir <span class="string">&quot;./data0/&quot;</span> --nodiscover  --ipcdisable   --port 3333    --rpc   --rpcport 4444    --rpcapi=<span class="string">&quot;db,eth,net,web3,personal&quot;</span>   --allow-insecure-unlock   --rpccorsdomain=<span class="string">&quot;http://remix.ethereum.org&quot;</span>   --networkid 1314     console 2&gt;output.log</span><br><span class="line">		--datadir <span class="comment">#指定数据存储位置（也是默认的私钥仓库位置keystore）</span></span><br><span class="line">		--networkid 123<span class="comment">#参数表示区块链网络ID标识，</span></span><br><span class="line">		--console <span class="comment">#参数表示进入geth控制台。</span></span><br><span class="line">		--rpc <span class="comment">#启动HTTP-RPC服务（基于HTTP的）</span></span><br><span class="line">		--rpcapi <span class="comment">#远程可调用的功能，默认web3,net,eth。4.24版本必须添加personal，否则remix无法读取本地账户列表；4.24版本testrpc也是无法读取用户列表。</span></span><br><span class="line">		--rpccorsdomain <span class="comment">#指定一个可以接收请求来源的以逗号间隔的域名列表（浏览器访问的话，要强制指定该选项）</span></span><br><span class="line">		--rpcaddr <span class="comment"># HTTP-RPC服务器监听地址(default: &quot;localhost&quot;)</span></span><br><span class="line">		--rpcport <span class="string">&quot;8545&quot;</span> <span class="comment">#设置geth的端口号，默认为8545</span></span><br><span class="line">		--port <span class="string">&quot;30303&quot;</span> <span class="comment">#设置监听端口号，用于与其他按节点进行连接，默认30303</span></span><br><span class="line">		--identity <span class="string">&quot;TestNetMainNode&quot;</span> <span class="comment">#设置节点标识</span></span><br><span class="line">		--ipcdiscover <span class="comment">#关闭进程间通信</span></span><br><span class="line">		--maxpeers 0 <span class="comment">#设置网络中可以被接入的最大节点数目，0代表不被其他节点接入</span></span><br><span class="line">		--nodiscover <span class="comment">#私有链,不被别人添加</span></span><br><span class="line">		--allow-insecure-unlock  <span class="comment">#禁止了HTTP通道解锁账户</span></span><br><span class="line">		--2&gt;&gt; output.log <span class="comment">#错误追加输出到output.log(所有信息不管错误和正确都输出到文件中)</span></span><br><span class="line">		<span class="comment">#连接测试网进入控制台，此时我们已经进入geth测试网的交互式控制台，窗口也显示「Welcome to the Geth JavaScript console」成功提示！</span></span><br><span class="line"><span class="comment">#注意： </span></span><br><span class="line"><span class="comment">#https://blog.csdn.net/qq_32938169 #某位大佬博客</span></span><br><span class="line"><span class="comment">#在当前目录下运行 geth，就会启动这条私链，注意要将 networked 设置为与创世块配置里的chainId 一致。</span></span><br><span class="line"><span class="comment">#异常：使用最新版本geth客户，当执行personal.unlockAccount()或在程序中调用personal_unlockAccount接口时，会出现：account unlock with HTTP access is forbidden异常。</span></span><br><span class="line"><span class="comment">#异常原因：新版本geth，出于安全考虑，默认禁止了HTTP通道解锁账户，相关issue：https://github.com/ethereum/go-ethereum/pull/17037</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>发送一比交易：</li>
+</ul>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">personal.sendTransaction(&#123;<span class="attr">from</span>: <span class="string">&quot;0xaC58C330aC8fF04fF828684d3FFABEFE987de7cb&quot;</span> , <span class="attr">to</span>: eth.accounts[<span class="number">0</span>] , <span class="attr">value</span>: web3.toWei(<span class="number">100</span> , <span class="string">&quot;ether&quot;</span>)&#125;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询账户余额且以ether方式显示</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">web3.fromWei(eth.getBalance(<span class="string">&quot;0xaC58C330aC8fF04fF828684d3FFABEFE987de7cb&quot;</span>)，,<span class="string">&#x27;ether&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询账户列表 </li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eth.accounts  #数组</span><br><span class="line">	- 输出结果：[]</span><br><span class="line">	- 含义：意思是无账户地址，因为我们什么也没做，所以当然是不会凭空出现账户了。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建新账户         </li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">personal.newAccount(<span class="string">&quot;password&quot;</span>)</span><br><span class="line"># 输出结果：hash</span><br><span class="line"># 含义：表明账户新建成功，返回账户地址，123为账户密码。此时我们再次查询账户列表会发现已有刚创建的地址了。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询账户余额            </li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eth.getBalance(eth.accounts[<span class="number">0</span>])</span><br><span class="line"># 输出结果：0</span><br><span class="line"># 含义：表明这个账户的余额是0。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动或停止挖矿        </li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">miner.start();#开始挖矿</span><br><span class="line">admin.sleepBlocks(<span class="number">1</span>);</span><br><span class="line">miner.stop()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>以Ether显示余额</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">web3.fromWei(eth.getBalance(eth.accounts[0]),&quot;ether&quot;)#查询余额</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>常见对象</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Geth Console 是一个交互式的 JavaScript 执行环境，里面内置了一些用来操作以太坊的 JavaScript 对象，我们可以直接调用这些对象来获取区块链上的相关信息。这些对象主要包括：</span><br><span class="line">		eth#主要包含对区块链进行访问和交互相关的方法；</span><br><span class="line">		net#主要包含查看 p2p 网络状态的方法；</span><br><span class="line">		admin#主要包含与管理节点相关的方法；</span><br><span class="line">		miner# 主要包含挖矿相关的一些方法；</span><br><span class="line">		personal#包含账户管理的方法；</span><br><span class="line">		txpool#包含查看交易内存池的方法；</span><br><span class="line">		web3#包含以上所有对象，还包含一些通用方法。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>常用命令</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#分类展示常见命令：</span><br><span class="line">Personal:</span><br><span class="line">		personal.newAccount(&quot;password&quot;)#创建账户；</span><br><span class="line">		personal.unlockAccount(eth.accounts[0])#解锁账户0；</span><br><span class="line">		personal.unlockAccount(eth.coinbase)#解锁当前挖矿的账户</span><br><span class="line">         personal.sendTransaction() #发送交易；参数：from  to value </span><br><span class="line">Eth:</span><br><span class="line">		eth.accounts #数组；列出系统中的账户；</span><br><span class="line">		eth.getBalance()#查看账户余额，返回值的单位是 Wei；</span><br><span class="line">		eth.blockNumber#列出当前区块高度；</span><br><span class="line">		eth.getTransaction()#获取交易信息；</span><br><span class="line">		eth.getBlock()#获取区块信息；</span><br><span class="line">         eth.estimateGas(&#123;data: code&#125;)#估计部署合约要用的gas</span><br><span class="line">         eth.sendTransaction(&#123;from:eth.accounts[0],to:eth.accounts[1],value:web3.toWei(2)&#125;)#交易</span><br><span class="line">         <span class="comment">//部署合约</span></span><br><span class="line">         <span class="keyword">var</span> code =<span class="string">&quot;合约bytecode&quot;</span>;</span><br><span class="line">		<span class="keyword">var</span> abi = <span class="string">&quot;合约ABI&quot;</span>;</span><br><span class="line">         var myContract = eth.contract(abi) #创建类，合约的ABI</span><br><span class="line">         myContract.new(&#123;from:eth.accounts[0] , data:code , gas:210000&#125;)#创建合约实例</span><br><span class="line">Miner: </span><br><span class="line">		miner.start()#开始挖矿；默认线程12</span><br><span class="line">		miner.stop()#停止挖矿；</span><br><span class="line">         miner.setEtherbase(eth.accounts[0])#设置挖矿人</span><br><span class="line">Web3:</span><br><span class="line">		web3.fromWei()# Wei 换算成以太币；</span><br><span class="line">         web3.fromWei(eth.getBalance(eth.accounts[0]),&#x27;ether&#x27;)#以ether方式查看余额</span><br><span class="line">		web3.toWei()#以太币换算成 Wei；</span><br><span class="line">Txpool:</span><br><span class="line">		txpool.status#交易池中的状态； </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>既然是javaScript的执行环境，肯定可以定义一些变量等其他</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#定义变量</span><br><span class="line"><span class="keyword">var</span>  variablename = value;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="Part2-部署智能合约"><a href="#Part2-部署智能合约" class="headerlink" title="Part2 部署智能合约"></a>Part2 部署智能合约</h3><ul>
+<li>在Remix-IDE中，可可以在编译界面看到<ul>
+<li>Compilation Details<ul>
+<li>打开可以看到ABI（Json还要进行压缩转移麻烦）和ByteCode（也可以直接支付下方的）</li>
+<li>更重要的是，可以直接复制WEB3DEPLOY的给定的JavaScript脚本直接粘贴到Geth即可，方便快捷</li>
+<li><code>惭愧：上面两种方式我都失败了，懒得弄了，后续有需求在搞，网上教程找个很多，都是这样操作的，但是我就是不成功</code>，最后乖乖的直接部署到Ganache/TestRPC。</li>
+</ul>
+</li>
+<li>IPFS，星际文件系统（分布式文件系统，去中心化，底层区块链）内容很多，功能很强大.<a target="_blank" rel="noopener" href="https://ipfs.io/">Download</a>科学上网去下，或者Git<ul>
+<li>我目前知道的好处：比如，互联网中常见的html网页，很多都是重复的内容，但是存储多份；此时如果通过IPFS进行存储，由于IPFS是基于内容寻址的，所以只要内容一样，解析的地址是同一个</li>
+<li>其次就是，IPDS也可以解决记录多版本问题</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2020/11/29/Geth_note/1606645161742.png" alt="4"></p>
+<ul>
+<li>定义变量存储合约信息</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> code =<span class="string">&quot;合约bytecode&quot;</span>;</span><br><span class="line"><span class="keyword">var</span> abi = <span class="string">&quot;合约ABI&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>估算部署合约要用的gas</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eth.estimateGas(&#123;<span class="attr">data</span>: code&#125;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>部署合约</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myContract = eth.contract(abi)</span><br><span class="line"><span class="comment">//创建类</span></span><br><span class="line"><span class="keyword">var</span> contract1 =myContract.new(&#123;<span class="attr">from</span>:<span class="string">&quot;0xe473d288faf6c2d1812dbb759d7423605c7d1a58&quot;</span>,<span class="attr">data</span>:code,<span class="attr">gas</span>:<span class="number">1200000</span>&#125;)</span><br><span class="line"><span class="comment">//创建合约实例。括号内部的from后填写的是你账户的地址。gas后填写你愿意支付的gas。原则上大于刚刚估计的值。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看合约信息</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">contract1 </span><br><span class="line">txpool.status</span><br><span class="line"><span class="comment">//这个命令可以看到有没有待挖矿的交易。我们可以看到有一个。</span></span><br><span class="line">miner.start()</span><br><span class="line">miner.stop()</span><br><span class="line"><span class="comment">//挖一会矿再停下来。</span></span><br><span class="line">txpool.status</span><br><span class="line"><span class="comment">//待挖矿交易变为0。就说明合约已经写入链上了。</span></span><br><span class="line">contract1.address</span><br><span class="line"><span class="comment">//调用这个可以看到我们部署到链上的合约的地址了。这个值保存下来。以后要用到。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>至此合约已经部署到了我们搭建的私链上了。</li>
+</ul>
+<hr>
+<ul>
+<li>如何调用已经部署好的合约</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 重新启动Geth控制台或者使用其他包时，调用原来部署好的智能合约要通过合约地址。</span><br><span class="line"># 没有写入链上的变量在经历重启geth或者重启web3程序时都会没有了。但是如果部署好的智能合约，并且写入数据时运用的交易都挖矿写入链中了。那么再次通过地址调用时关于合约的数据就都还保留。</span><br><span class="line"># 下面示例在Geth中调用合约的方法。假设我们现在已经重启了Geth控制台，首先还是要用合约地址实例化一个合约出来。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> abi=<span class="built_in">JSON</span>.parse(‘合约的abi’)</span><br><span class="line"><span class="comment">//录入ABI。格式同上一节</span></span><br><span class="line">myContract = eth.contract(abi)</span><br><span class="line"><span class="comment">//创建类</span></span><br><span class="line">contract = myContract.at(address)</span><br><span class="line"><span class="comment">//创建合约实例，这里要指名部署过的合约地址。地址先前已经保存。</span></span><br></pre></td></tr></table></figure>
+<p>通过geth控制台调用智能合约中的函数<br>智能合约中的函数分为两类，一种是需要付gas才能调用的函数，一种是无需花费gas的函数。这两类函数在geth控制台中被调用时用到的命令不一样，这里分别举两个例子。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">personal.unlockAccount(eth.coinbase)</span><br><span class="line"><span class="comment">//记得先解锁账户</span></span><br><span class="line">contract.函数名.sendTransaction(<span class="string">&quot;参数1&quot;</span>,<span class="string">&quot;参数2&quot;</span>,<span class="string">&quot;参数...&quot;</span>,&#123;<span class="attr">from</span>:<span class="string">&quot;0xe473d288faf6c2d1812dbb759d7423605c7d1a58&quot;</span>&#125;)</span><br><span class="line"><span class="comment">//上面是在geth控制台调用transactionn类型（要付gas类的）函数的方法。函数名要替换成自己的，括号内部前部分为函数的参数，分别列出，最后一项大括号内from要写付费的用户的地址（换成自己的）。</span></span><br><span class="line">contract.函数名.call(<span class="string">&quot;参数1&quot;</span>,<span class="string">&quot;参数2&quot;</span>, <span class="string">&quot;参数...&quot;</span>)</span><br><span class="line"><span class="comment">//调用call类型函数的方法，（不要付gas类的）。</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p>所有函数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&gt; eth.</span><br><span class="line">eth._requestManager            eth.getBlockTransactionCount   eth.getUncle</span><br><span class="line">eth.accounts                   eth.getBlockUncleCount         eth.getWork</span><br><span class="line">eth.blockNumber                eth.getCode                    eth.hashrate</span><br><span class="line">eth.call                       eth.getCoinbase                eth.iban</span><br><span class="line">eth.chainId                    eth.getCompilers               eth.icapNamereg</span><br><span class="line">eth.coinbase                   eth.getGasPrice                eth.isSyncing</span><br><span class="line">eth.compile                    eth.getHashrate                eth.mining</span><br><span class="line">eth.constructor                eth.getHeaderByHash            eth.namereg</span><br><span class="line">eth.contract                   eth.getHeaderByNumber          eth.pendingTransactions</span><br><span class="line">eth.defaultAccount             eth.getMining                  eth.protocolVersion</span><br><span class="line">eth.defaultBlock               eth.getPendingTransactions     eth.resend</span><br><span class="line">eth.estimateGas                eth.getProof                   eth.sendIBANTransaction</span><br><span class="line">eth.fillTransaction            eth.getProtocolVersion         eth.sendRawTransaction</span><br><span class="line">eth.filter                     eth.getRawTransaction          eth.sendTransaction</span><br><span class="line">eth.gasPrice                   eth.getRawTransactionFromBlock eth.sign</span><br><span class="line">eth.getAccounts                eth.getStorageAt               eth.signTransaction</span><br><span class="line">eth.getBalance                 eth.getSyncing                 eth.submitTransaction</span><br><span class="line">eth.getBlock                   eth.getTransaction             eth.submitWork</span><br><span class="line">eth.getBlockByHash             eth.getTransactionCount        eth.syncing</span><br><span class="line">eth.getBlockByNumber           eth.getTransactionFromBlock</span><br><span class="line">eth.getBlockNumber             eth.getTransactionReceipt</span><br><span class="line">&gt; personal.</span><br><span class="line">personal._requestManager  personal.getListWallets   personal.lockAccount      personal.signTransaction</span><br><span class="line">personal.constructor      personal.importRawKey     personal.newAccount       personal.unlockAccount</span><br><span class="line">personal.deriveAccount    personal.initializeWallet personal.openWallet       personal.unpair</span><br><span class="line">personal.ecRecover        personal.listAccounts     personal.sendTransaction</span><br><span class="line">personal.getListAccounts  personal.listWallets      personal.sign</span><br><span class="line">&gt; miner.</span><br><span class="line">miner.constructor          miner.propertyIsEnumerable miner.setRecommitInterval  miner.toString</span><br><span class="line">miner.getHashrate          miner.setEtherbase         miner.start                miner.valueOf</span><br><span class="line">miner.hasOwnProperty       miner.setExtra             miner.stop</span><br><span class="line">miner.isPrototypeOf        miner.setGasPrice          miner.toLocaleString</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Part3-本地环境信息"><a href="#Part3-本地环境信息" class="headerlink" title="Part3 本地环境信息"></a>Part3 本地环境信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br></pre></td><td class="code"><pre><span class="line">&gt; admin</span><br><span class="line">		&#123;</span><br><span class="line">		  datadir: <span class="string">&quot;D:\\gethData&quot;</span>,</span><br><span class="line">		  nodeInfo: &#123;</span><br><span class="line">		    enode: <span class="string">&quot;enode://fac072814049255eb2f4c8c2c381183d87ee519d93600852cdcabd7dc3d9224d916be319bb2bfed89430112225f338d9dc15ea818f89cd242e46a05dd6bd63a7@192.168.136.117:30303&quot;</span>,</span><br><span class="line">		    enr: <span class="string">&quot;enr:-Je4QFYrz1dcrKYsGSKlFZARRs4T6pki558pyHzIb1294oLWfgVCCLANovQUjqPjxi7jqfHjS_Elg3BI97K7JyFtbVACg2V0aMfGhMmaRmeAgmlkgnY0gmlwhMCoiHWJc2VjcDI1NmsxoQP6wHKBQEklXrL0yMLDgRg9h-5RnZNgCFLNyr19w9kiTYN0Y3CCdl-DdWRwgnZf&quot;</span>,</span><br><span class="line">		    id: <span class="string">&quot;8a2d0a9309f63565292f84e6286532af5abc27df6abfb93f49c0d2d077b9666d&quot;</span>,</span><br><span class="line">		    ip: <span class="string">&quot;192.168.136.117&quot;</span>,</span><br><span class="line">		    listenAddr: <span class="string">&quot;[::]:30303&quot;</span>,</span><br><span class="line">		    name: <span class="string">&quot;Geth/v1.9.23-stable-8c2f2715/windows-amd64/go1.15&quot;</span>,</span><br><span class="line">		    ports: &#123;</span><br><span class="line">		      discovery: 30303,</span><br><span class="line">		      listener: 30303</span><br><span class="line">		    &#125;,</span><br><span class="line">		    protocols: &#123;</span><br><span class="line">		      eth: &#123;</span><br><span class="line">			config: &#123;...&#125;,</span><br><span class="line">			difficulty: 2000,</span><br><span class="line">			genesis: <span class="string">&quot;0xdc9866ac4601761e6b960e690eb144c03dd48e7125c99e14ecf0a0af5d739224&quot;</span>,</span><br><span class="line">			head: <span class="string">&quot;0xdc9866ac4601761e6b960e690eb144c03dd48e7125c99e14ecf0a0af5d739224&quot;</span>,</span><br><span class="line">			network: 16</span><br><span class="line">		      &#125;</span><br><span class="line">		    &#125;</span><br><span class="line">		  &#125;,</span><br><span class="line">		  peers: [&#123;</span><br><span class="line">		      caps: [<span class="string">&quot;eth/63&quot;</span>],</span><br><span class="line">		      enode: <span class="string">&quot;enode://8192f9e5cfa8fb73e914c39e830211ab2b98d6180df1cf009c1b1c9ddad3bb6d09d986db5ee125f4bb59c226014e72975f170c734774cc389ccb6e6f73fcce34@174.138.19.97:1234&quot;</span>,</span><br><span class="line">		      id: <span class="string">&quot;f227374bcd5f39fff43a333f04cbe43393f5db0baf5eb4ebddd9c8a9ae6fdfbe&quot;</span>,</span><br><span class="line">		      name: <span class="string">&quot;Geth/v1.0.0-stable-7e368c8e/linux-amd64/go1.12.10&quot;</span>,</span><br><span class="line">		      network: &#123;</span><br><span class="line">			inbound: <span class="literal">false</span>,</span><br><span class="line">			localAddress: <span class="string">&quot;192.168.1.118:50638&quot;</span>,</span><br><span class="line">			remoteAddress: <span class="string">&quot;174.138.19.97:1234&quot;</span>,</span><br><span class="line">			static: <span class="literal">false</span>,</span><br><span class="line">			trusted: <span class="literal">false</span></span><br><span class="line">		      &#125;,</span><br><span class="line">		      protocols: &#123;</span><br><span class="line">			eth: <span class="string">&quot;handshake&quot;</span></span><br><span class="line">		      &#125;</span><br><span class="line">		  &#125;, &#123;</span><br><span class="line">		      caps: [<span class="string">&quot;eth/63&quot;</span>, <span class="string">&quot;eth/64&quot;</span>, <span class="string">&quot;eth/65&quot;</span>],</span><br><span class="line">		      enode: <span class="string">&quot;enode://5928e6c7a1b9c90014b5b5ef5fbd305636b477f2e35b5c608ed7fae82e0ea3295be2c716ec50de640e5b0665c44f652cde5c9f3a6e4bcf134657a6944cd91d39@149.5.29.162:30303&quot;</span>,</span><br><span class="line">		      id: <span class="string">&quot;f24d4969e9e4f171b36d962f15ea1bc25b037731a99eee25887b02d1437d09ac&quot;</span>,</span><br><span class="line">		      name: <span class="string">&quot;Pirl/v1.9.12-v7-masternode-premium-lion-ea07aebf-20200407/linux-amd64/go1.13.6&quot;</span>,</span><br><span class="line">		      network: &#123;</span><br><span class="line">			inbound: <span class="literal">false</span>,</span><br><span class="line">			localAddress: <span class="string">&quot;192.168.1.118:50661&quot;</span>,</span><br><span class="line">			remoteAddress: <span class="string">&quot;149.5.29.162:30303&quot;</span>,</span><br><span class="line">			static: <span class="literal">false</span>,</span><br><span class="line">			trusted: <span class="literal">false</span></span><br><span class="line">		      &#125;,</span><br><span class="line">		      protocols: &#123;</span><br><span class="line">			eth: <span class="string">&quot;handshake&quot;</span></span><br><span class="line">		      &#125;</span><br><span class="line">		  &#125;],</span><br><span class="line">		  addPeer: <span class="keyword">function</span>(),</span><br><span class="line">		  addTrustedPeer: <span class="keyword">function</span>(),</span><br><span class="line">		  clearHistory: <span class="keyword">function</span>(),</span><br><span class="line">		  exportChain: <span class="keyword">function</span>(),</span><br><span class="line">		  getDatadir: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getNodeInfo: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getPeers: <span class="keyword">function</span>(callback),</span><br><span class="line">		  importChain: <span class="keyword">function</span>(),</span><br><span class="line">		  removePeer: <span class="keyword">function</span>(),</span><br><span class="line">		  removeTrustedPeer: <span class="keyword">function</span>(),</span><br><span class="line">		  sleep: <span class="keyword">function</span>(),</span><br><span class="line">		  sleepBlocks: <span class="keyword">function</span>(),</span><br><span class="line">		  startRPC: <span class="keyword">function</span>(),</span><br><span class="line">		  startWS: <span class="keyword">function</span>(),</span><br><span class="line">		  stopRPC: <span class="keyword">function</span>(),</span><br><span class="line">		  stopWS: <span class="keyword">function</span>()</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">personal</span><br><span class="line">		&gt; personal</span><br><span class="line">		&#123;</span><br><span class="line">		  listAccounts: [<span class="string">&quot;0xc59256c9f92d19e877d4a9931652ccbcd1260076&quot;</span>],</span><br><span class="line">		  listWallets: [&#123;</span><br><span class="line">		      accounts: [&#123;...&#125;],</span><br><span class="line">		      status: <span class="string">&quot;Locked&quot;</span>,</span><br><span class="line">		      url: <span class="string">&quot;keystore://D:\\gethData\\keystore\\UTC--2020-11-10T00-51-59.108912200Z--c59256c9f92d19e877d4a9931652ccbcd1260076&quot;</span></span><br><span class="line">		  &#125;],</span><br><span class="line">		  deriveAccount: <span class="keyword">function</span>(),</span><br><span class="line">		  ecRecover: <span class="keyword">function</span>(),</span><br><span class="line">		  getListAccounts: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getListWallets: <span class="keyword">function</span>(callback),</span><br><span class="line">		  importRawKey: <span class="keyword">function</span>(),</span><br><span class="line">		  initializeWallet: <span class="keyword">function</span>(),</span><br><span class="line">		  lockAccount: <span class="keyword">function</span>(),</span><br><span class="line">		  newAccount: <span class="keyword">function</span>(),</span><br><span class="line">		  openWallet: <span class="keyword">function</span>(),</span><br><span class="line">		  sendTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  sign: <span class="keyword">function</span>(),</span><br><span class="line">		  signTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  unlockAccount: <span class="keyword">function</span>(),</span><br><span class="line">		  unpair: <span class="keyword">function</span>()</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">miner</span><br><span class="line">		&gt; miner</span><br><span class="line">		&#123;</span><br><span class="line">		  getHashrate: <span class="keyword">function</span>(),</span><br><span class="line">		  setEtherbase: <span class="keyword">function</span>(),</span><br><span class="line">		  setExtra: <span class="keyword">function</span>(),</span><br><span class="line">		  setGasPrice: <span class="keyword">function</span>(),</span><br><span class="line">		  setRecommitInterval: <span class="keyword">function</span>(),</span><br><span class="line">		  start: <span class="keyword">function</span>(),</span><br><span class="line">		  stop: <span class="keyword">function</span>()</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">eth</span><br><span class="line">		&gt; eth</span><br><span class="line">		&#123;</span><br><span class="line">		  accounts: [<span class="string">&quot;0xc59256c9f92d19e877d4a9931652ccbcd1260076&quot;</span>],</span><br><span class="line">		  blockNumber: 0,</span><br><span class="line">		  coinbase: <span class="string">&quot;0xc59256c9f92d19e877d4a9931652ccbcd1260076&quot;</span>,</span><br><span class="line">		  compile: &#123;</span><br><span class="line">		    lll: <span class="keyword">function</span>(),</span><br><span class="line">		    serpent: <span class="keyword">function</span>(),</span><br><span class="line">		    solidity: <span class="keyword">function</span>()</span><br><span class="line">		  &#125;,</span><br><span class="line">		  defaultAccount: undefined,</span><br><span class="line">		  defaultBlock: <span class="string">&quot;latest&quot;</span>,</span><br><span class="line">		  gasPrice: 1000000000,</span><br><span class="line">		  hashrate: 0,</span><br><span class="line">		  mining: <span class="literal">false</span>,</span><br><span class="line">		  pendingTransactions: [],</span><br><span class="line">		  protocolVersion: <span class="string">&quot;0x41&quot;</span>,</span><br><span class="line">		  syncing: <span class="literal">false</span>,</span><br><span class="line">		  call: <span class="keyword">function</span>(),</span><br><span class="line">		  chainId: <span class="keyword">function</span>(),</span><br><span class="line">		  contract: <span class="keyword">function</span>(abi),</span><br><span class="line">		  estimateGas: <span class="keyword">function</span>(),</span><br><span class="line">		  fillTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  filter: <span class="keyword">function</span>(options, callback, filterCreationErrorCallback),</span><br><span class="line">		  getAccounts: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getBalance: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlock: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlockByHash: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlockByNumber: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlockNumber: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getBlockTransactionCount: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlockUncleCount: <span class="keyword">function</span>(),</span><br><span class="line">		  getCode: <span class="keyword">function</span>(),</span><br><span class="line">		  getCoinbase: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getCompilers: <span class="keyword">function</span>(),</span><br><span class="line">		  getGasPrice: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getHashrate: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getHeaderByHash: <span class="keyword">function</span>(),</span><br><span class="line">		  getHeaderByNumber: <span class="keyword">function</span>(),</span><br><span class="line">		  getMining: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getPendingTransactions: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getProof: <span class="keyword">function</span>(),</span><br><span class="line">		  getProtocolVersion: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getRawTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  getRawTransactionFromBlock: <span class="keyword">function</span>(),</span><br><span class="line">		  getStorageAt: <span class="keyword">function</span>(),</span><br><span class="line">		  getSyncing: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  getTransactionCount: <span class="keyword">function</span>(),</span><br><span class="line">		  getTransactionFromBlock: <span class="keyword">function</span>(),</span><br><span class="line">		  getTransactionReceipt: <span class="keyword">function</span>(),</span><br><span class="line">		  getUncle: <span class="keyword">function</span>(),</span><br><span class="line">		  getWork: <span class="keyword">function</span>(),</span><br><span class="line">		  iban: <span class="keyword">function</span>(iban),</span><br><span class="line">		  icapNamereg: <span class="keyword">function</span>(),</span><br><span class="line">		  isSyncing: <span class="keyword">function</span>(callback),</span><br><span class="line">		  namereg: <span class="keyword">function</span>(),</span><br><span class="line">		  resend: <span class="keyword">function</span>(),</span><br><span class="line">		  sendIBANTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  sendRawTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  sendTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  sign: <span class="keyword">function</span>(),</span><br><span class="line">		  signTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  submitTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  submitWork: <span class="keyword">function</span>()</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://www.zzugo.ayxyj.cn/2020/11/29/Geth_note/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BlockChain/" rel="tag">BlockChain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Geth/" rel="tag">Geth</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MetaMask/" rel="tag">MetaMask</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2020/11/29/EVM_Source/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            (no title)
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2020/11/25/fabric/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Hyperledger Fabric - 01 - 安装并测试网络</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "TeJhVuUSrasQYTxdBWOzzhfN-gzGzoHsz",
+    app_key: "0zHtp5jbdUnzBM9aw0joIGOa",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2018-2020
+        <i class="ri-heart-fill heart_icon"></i> Syraer
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+        <li>
+          <a href="http://www.beian.gov.cn/portal/index" target="_black" rel="nofollow">皖ICP备18009389号-1</a>
+        </li>
+        
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1279416140&amp;web_id=1279416140'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Syraer&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true
+  }
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+    
+  </div>
+</body>
+
+</html>

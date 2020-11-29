@@ -337,6 +337,220 @@
 
     
     <article
+  id="post-Geth_note"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/29/Geth_note/"
+    >Geth_搭建私有链</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/29/Geth_note/" class="article-date">
+  <time datetime="2020-11-29T10:32:14.000Z" itemprop="datePublished">2020-11-29</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/BlockChain/">BlockChain</a> / <a class="article-category-link" href="/categories/BlockChain/Geth/">Geth</a> / <a class="article-category-link" href="/categories/BlockChain/Geth/MetaMask/">MetaMask</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>MetaMask_pass:spot raccoon network sweet feel song knee put just uncover news audit //我的MetaMask助记词 ；可以直接用Remix-IDE连接geth，也可以通过MetaMask连接Geth，这样MetaMask帮助你实现r s v ，不用自己去弄！</p>
+<p>Geth客户端：<a target="_blank" rel="noopener" href="https://geth.ethereum.org/downloads/">Geth_download</a></p>
+<h3 id="Part0-MetaMask"><a href="#Part0-MetaMask" class="headerlink" title="Part0 MetaMask"></a>Part0 MetaMask</h3><p><img src="/2020/11/29/Geth_note/1606643269702.png" alt="1"></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#通过MetaMask连接本地Geth或者Ganache搭建的私有链或者TestRPC等都可以，这样会比较方便查看部署的合约和交易信息，而且更贴合实际操作。</span><br><span class="line">#如果不想搭建私有链，可以通过测试网络去部署合约和交易也是可以的，但是首先需要从对应的测试网络水龙头获取ether操作及之后测试需要科学上网。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>在本地通过npm安装一个remixd，这样可以实时将本地和浏览器代码同步，方便存储代码。<code>npm install remixd -g</code></p>
+<p><img src="/2020/11/29/Geth_note/1606643713320.png" alt="2"></p>
+</li>
+<li><p>部署合约和测试合约</p>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#智能合约</span><br><span class="line">#Solidity编译器是solc，通过remix-ide编写合约时候，注意solc的版本  </span><br><span class="line">#pragma solidity &gt;<span class="number">0.6</span><span class="number">.2</span> 也可以，当版本出现错误时候，可以尝试改变编译版本</span><br><span class="line">pragma solidity ^<span class="number">0.6</span><span class="number">.2</span>;</span><br><span class="line"></span><br><span class="line">contract Test&#123;</span><br><span class="line">    <span class="comment">//contract balance</span></span><br><span class="line">    uint public  money  ;</span><br><span class="line">    <span class="comment">//在remix中修改value 运行paly，金额就转到合约当中去了，然后通过transfer转到其他账户中去</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">paly</span>(<span class="params"></span>) <span class="title">public</span> <span class="title">payable</span></span>&#123;</span><br><span class="line">        money = msg.value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//contract balance </span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getBalance</span>(<span class="params"></span>) <span class="title">public</span> <span class="title">view</span> <span class="title">returns</span>(<span class="params">uint256</span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> address(<span class="built_in">this</span>).balance;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    address payable addr =  <span class="number">0x78662A9CFfFc852cF61a5c6c637cFB93f1c59397</span>;</span><br><span class="line">    <span class="comment">//transfer who ,who call </span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">transfer</span>(<span class="params">uint i </span>) <span class="title">public</span> <span class="title">payable</span>  </span>&#123;</span><br><span class="line">        addr.transfer ( i * <span class="number">10</span> ** <span class="number">18</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>接种编写合约的方式</p>
+<ul>
+<li>VS code IDE,代码编写,基本的语法检查.</li>
+<li>Remix IDE,简单代码编译运行看结果.方便学习.</li>
+<li>Truffle 环境,生产环境,较为复杂的代码编译部署.</li>
+</ul>
+</li>
+<li><p>ENVIRONMENT</p>
+<ul>
+<li>JavaScriptVM<ul>
+<li>该方式环境是将合约部署到浏览器的Solidity编译环境，可以在内存中模拟合约,直接运行,而不需要部署等复杂流程,适合入门学习.</li>
+</ul>
+</li>
+<li>Injected Web3<ul>
+<li>该方式可以连接到MetaMask.</li>
+</ul>
+</li>
+<li>Web3 Provider<ul>
+<li>该方式通过本地私有网络的rpc端口,链接到本地私有网络进行调试.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Deployed Contracts</p>
+<ul>
+<li>可以看到已经部署的合约，此时就可以看到在合约中写的相应get-set函数和public的状态变量;</li>
+<li>可以进行智能合约回调，当且只有产生新的数据才会发生交易，否则仅仅是调用，而不会产生新的交易区块.</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2020/11/29/Geth_note/1606643984807.png" alt="3"></p>
+<h3 id="Part1-Geth入门"><a href="#Part1-Geth入门" class="headerlink" title="Part1 Geth入门"></a>Part1 Geth入门</h3><ul>
+<li>创世块</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;config&quot;</span>: &#123;</span><br><span class="line">	<span class="attr">&quot;chainId&quot;</span>: <span class="number">15</span></span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="attr">&quot;difficulty&quot;</span>: <span class="string">&quot;2000&quot;</span>,</span><br><span class="line">	<span class="attr">&quot;gasLimit&quot;</span>: <span class="string">&quot;2100000&quot;</span>,</span><br><span class="line">	<span class="attr">&quot;alloc&quot;</span>: &#123;</span><br><span class="line">		<span class="attr">&quot;7df9a875a174b3bc565e6424a0050ebc1b2d1d82&quot;</span>: &#123; <span class="attr">&quot;balance&quot;</span>: <span class="string">&quot;300000000000000000000&quot;</span> &#125;,</span><br><span class="line">		<span class="attr">&quot;f41c74c9ae680c1aa78f42e5647a62f353b7bdde&quot;</span>: &#123; <span class="attr">&quot;balance&quot;</span>: <span class="string">&quot;400000000000000000000&quot;</span> &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>初始化创世快</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">D:\gethData&gt;geth --datadir . init genesis.json</span><br><span class="line">	此时在testGeth目录下会生成data目录，data目录又包含geth和keystore目录，geth目录存储区块数据，keystore目录则保存账户信息。</span><br><span class="line">	--init #根据genesis.json文件初始化创世区块</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动geth并开启远程RPC然后log输出到output.log里面</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">D:\gethData&gt;geth --datadir ./data0/ --rpc --rpccorsdomain <span class="string">&quot;*&quot;</span> --rpcaddr <span class="string">&quot;0.0.0.0&quot;</span> --rpcapi <span class="string">&quot;personal,admin,miner,db,eth,net,web3&quot;</span> --ipcdisable  --nodiscover  --allow-insecure-unlock --networkid 15 console 2&gt;&gt; output.log</span><br><span class="line">D:\gethData&gt;geth --datadir <span class="string">&quot;./data0/&quot;</span> --nodiscover  --ipcdisable   --port 3333    --rpc   --rpcport 4444    --rpcapi=<span class="string">&quot;db,eth,net,web3,personal&quot;</span>   --allow-insecure-unlock   --rpccorsdomain=<span class="string">&quot;http://remix.ethereum.org&quot;</span>   --networkid 1314     console 2&gt;output.log</span><br><span class="line">		--datadir <span class="comment">#指定数据存储位置（也是默认的私钥仓库位置keystore）</span></span><br><span class="line">		--networkid 123<span class="comment">#参数表示区块链网络ID标识，</span></span><br><span class="line">		--console <span class="comment">#参数表示进入geth控制台。</span></span><br><span class="line">		--rpc <span class="comment">#启动HTTP-RPC服务（基于HTTP的）</span></span><br><span class="line">		--rpcapi <span class="comment">#远程可调用的功能，默认web3,net,eth。4.24版本必须添加personal，否则remix无法读取本地账户列表；4.24版本testrpc也是无法读取用户列表。</span></span><br><span class="line">		--rpccorsdomain <span class="comment">#指定一个可以接收请求来源的以逗号间隔的域名列表（浏览器访问的话，要强制指定该选项）</span></span><br><span class="line">		--rpcaddr <span class="comment"># HTTP-RPC服务器监听地址(default: &quot;localhost&quot;)</span></span><br><span class="line">		--rpcport <span class="string">&quot;8545&quot;</span> <span class="comment">#设置geth的端口号，默认为8545</span></span><br><span class="line">		--port <span class="string">&quot;30303&quot;</span> <span class="comment">#设置监听端口号，用于与其他按节点进行连接，默认30303</span></span><br><span class="line">		--identity <span class="string">&quot;TestNetMainNode&quot;</span> <span class="comment">#设置节点标识</span></span><br><span class="line">		--ipcdiscover <span class="comment">#关闭进程间通信</span></span><br><span class="line">		--maxpeers 0 <span class="comment">#设置网络中可以被接入的最大节点数目，0代表不被其他节点接入</span></span><br><span class="line">		--nodiscover <span class="comment">#私有链,不被别人添加</span></span><br><span class="line">		--allow-insecure-unlock  <span class="comment">#禁止了HTTP通道解锁账户</span></span><br><span class="line">		--2&gt;&gt; output.log <span class="comment">#错误追加输出到output.log(所有信息不管错误和正确都输出到文件中)</span></span><br><span class="line">		<span class="comment">#连接测试网进入控制台，此时我们已经进入geth测试网的交互式控制台，窗口也显示「Welcome to the Geth JavaScript console」成功提示！</span></span><br><span class="line"><span class="comment">#注意： </span></span><br><span class="line"><span class="comment">#https://blog.csdn.net/qq_32938169 #某位大佬博客</span></span><br><span class="line"><span class="comment">#在当前目录下运行 geth，就会启动这条私链，注意要将 networked 设置为与创世块配置里的chainId 一致。</span></span><br><span class="line"><span class="comment">#异常：使用最新版本geth客户，当执行personal.unlockAccount()或在程序中调用personal_unlockAccount接口时，会出现：account unlock with HTTP access is forbidden异常。</span></span><br><span class="line"><span class="comment">#异常原因：新版本geth，出于安全考虑，默认禁止了HTTP通道解锁账户，相关issue：https://github.com/ethereum/go-ethereum/pull/17037</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>发送一比交易：</li>
+</ul>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">personal.sendTransaction(&#123;<span class="attr">from</span>: <span class="string">&quot;0xaC58C330aC8fF04fF828684d3FFABEFE987de7cb&quot;</span> , <span class="attr">to</span>: eth.accounts[<span class="number">0</span>] , <span class="attr">value</span>: web3.toWei(<span class="number">100</span> , <span class="string">&quot;ether&quot;</span>)&#125;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询账户余额且以ether方式显示</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">web3.fromWei(eth.getBalance(<span class="string">&quot;0xaC58C330aC8fF04fF828684d3FFABEFE987de7cb&quot;</span>)，,<span class="string">&#x27;ether&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询账户列表 </li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eth.accounts  #数组</span><br><span class="line">	- 输出结果：[]</span><br><span class="line">	- 含义：意思是无账户地址，因为我们什么也没做，所以当然是不会凭空出现账户了。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建新账户         </li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">personal.newAccount(<span class="string">&quot;password&quot;</span>)</span><br><span class="line"># 输出结果：hash</span><br><span class="line"># 含义：表明账户新建成功，返回账户地址，123为账户密码。此时我们再次查询账户列表会发现已有刚创建的地址了。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询账户余额            </li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eth.getBalance(eth.accounts[<span class="number">0</span>])</span><br><span class="line"># 输出结果：0</span><br><span class="line"># 含义：表明这个账户的余额是0。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动或停止挖矿        </li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">miner.start();#开始挖矿</span><br><span class="line">admin.sleepBlocks(<span class="number">1</span>);</span><br><span class="line">miner.stop()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>以Ether显示余额</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">web3.fromWei(eth.getBalance(eth.accounts[0]),&quot;ether&quot;)#查询余额</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>常见对象</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Geth Console 是一个交互式的 JavaScript 执行环境，里面内置了一些用来操作以太坊的 JavaScript 对象，我们可以直接调用这些对象来获取区块链上的相关信息。这些对象主要包括：</span><br><span class="line">		eth#主要包含对区块链进行访问和交互相关的方法；</span><br><span class="line">		net#主要包含查看 p2p 网络状态的方法；</span><br><span class="line">		admin#主要包含与管理节点相关的方法；</span><br><span class="line">		miner# 主要包含挖矿相关的一些方法；</span><br><span class="line">		personal#包含账户管理的方法；</span><br><span class="line">		txpool#包含查看交易内存池的方法；</span><br><span class="line">		web3#包含以上所有对象，还包含一些通用方法。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>常用命令</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#分类展示常见命令：</span><br><span class="line">Personal:</span><br><span class="line">		personal.newAccount(&quot;password&quot;)#创建账户；</span><br><span class="line">		personal.unlockAccount(eth.accounts[0])#解锁账户0；</span><br><span class="line">		personal.unlockAccount(eth.coinbase)#解锁当前挖矿的账户</span><br><span class="line">         personal.sendTransaction() #发送交易；参数：from  to value </span><br><span class="line">Eth:</span><br><span class="line">		eth.accounts #数组；列出系统中的账户；</span><br><span class="line">		eth.getBalance()#查看账户余额，返回值的单位是 Wei；</span><br><span class="line">		eth.blockNumber#列出当前区块高度；</span><br><span class="line">		eth.getTransaction()#获取交易信息；</span><br><span class="line">		eth.getBlock()#获取区块信息；</span><br><span class="line">         eth.estimateGas(&#123;data: code&#125;)#估计部署合约要用的gas</span><br><span class="line">         eth.sendTransaction(&#123;from:eth.accounts[0],to:eth.accounts[1],value:web3.toWei(2)&#125;)#交易</span><br><span class="line">         <span class="comment">//部署合约</span></span><br><span class="line">         <span class="keyword">var</span> code =<span class="string">&quot;合约bytecode&quot;</span>;</span><br><span class="line">		<span class="keyword">var</span> abi = <span class="string">&quot;合约ABI&quot;</span>;</span><br><span class="line">         var myContract = eth.contract(abi) #创建类，合约的ABI</span><br><span class="line">         myContract.new(&#123;from:eth.accounts[0] , data:code , gas:210000&#125;)#创建合约实例</span><br><span class="line">Miner: </span><br><span class="line">		miner.start()#开始挖矿；默认线程12</span><br><span class="line">		miner.stop()#停止挖矿；</span><br><span class="line">         miner.setEtherbase(eth.accounts[0])#设置挖矿人</span><br><span class="line">Web3:</span><br><span class="line">		web3.fromWei()# Wei 换算成以太币；</span><br><span class="line">         web3.fromWei(eth.getBalance(eth.accounts[0]),&#x27;ether&#x27;)#以ether方式查看余额</span><br><span class="line">		web3.toWei()#以太币换算成 Wei；</span><br><span class="line">Txpool:</span><br><span class="line">		txpool.status#交易池中的状态； </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>既然是javaScript的执行环境，肯定可以定义一些变量等其他</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#定义变量</span><br><span class="line"><span class="keyword">var</span>  variablename = value;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="Part2-部署智能合约"><a href="#Part2-部署智能合约" class="headerlink" title="Part2 部署智能合约"></a>Part2 部署智能合约</h3><ul>
+<li>在Remix-IDE中，可可以在编译界面看到<ul>
+<li>Compilation Details<ul>
+<li>打开可以看到ABI（Json还要进行压缩转移麻烦）和ByteCode（也可以直接支付下方的）</li>
+<li>更重要的是，可以直接复制WEB3DEPLOY的给定的JavaScript脚本直接粘贴到Geth即可，方便快捷</li>
+<li><code>惭愧：上面两种方式我都失败了，懒得弄了，后续有需求在搞，网上教程找个很多，都是这样操作的，但是我就是不成功</code>，最后乖乖的直接部署到Ganache/TestRPC。</li>
+</ul>
+</li>
+<li>IPFS，星际文件系统（分布式文件系统，去中心化，底层区块链）内容很多，功能很强大.<a target="_blank" rel="noopener" href="https://ipfs.io/">Download</a>科学上网去下，或者Git<ul>
+<li>我目前知道的好处：比如，互联网中常见的html网页，很多都是重复的内容，但是存储多份；此时如果通过IPFS进行存储，由于IPFS是基于内容寻址的，所以只要内容一样，解析的地址是同一个</li>
+<li>其次就是，IPDS也可以解决记录多版本问题</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2020/11/29/Geth_note/1606645161742.png" alt="4"></p>
+<ul>
+<li>定义变量存储合约信息</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> code =<span class="string">&quot;合约bytecode&quot;</span>;</span><br><span class="line"><span class="keyword">var</span> abi = <span class="string">&quot;合约ABI&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>估算部署合约要用的gas</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eth.estimateGas(&#123;<span class="attr">data</span>: code&#125;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>部署合约</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myContract = eth.contract(abi)</span><br><span class="line"><span class="comment">//创建类</span></span><br><span class="line"><span class="keyword">var</span> contract1 =myContract.new(&#123;<span class="attr">from</span>:<span class="string">&quot;0xe473d288faf6c2d1812dbb759d7423605c7d1a58&quot;</span>,<span class="attr">data</span>:code,<span class="attr">gas</span>:<span class="number">1200000</span>&#125;)</span><br><span class="line"><span class="comment">//创建合约实例。括号内部的from后填写的是你账户的地址。gas后填写你愿意支付的gas。原则上大于刚刚估计的值。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看合约信息</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">contract1 </span><br><span class="line">txpool.status</span><br><span class="line"><span class="comment">//这个命令可以看到有没有待挖矿的交易。我们可以看到有一个。</span></span><br><span class="line">miner.start()</span><br><span class="line">miner.stop()</span><br><span class="line"><span class="comment">//挖一会矿再停下来。</span></span><br><span class="line">txpool.status</span><br><span class="line"><span class="comment">//待挖矿交易变为0。就说明合约已经写入链上了。</span></span><br><span class="line">contract1.address</span><br><span class="line"><span class="comment">//调用这个可以看到我们部署到链上的合约的地址了。这个值保存下来。以后要用到。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>至此合约已经部署到了我们搭建的私链上了。</li>
+</ul>
+<hr>
+<ul>
+<li>如何调用已经部署好的合约</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 重新启动Geth控制台或者使用其他包时，调用原来部署好的智能合约要通过合约地址。</span><br><span class="line"># 没有写入链上的变量在经历重启geth或者重启web3程序时都会没有了。但是如果部署好的智能合约，并且写入数据时运用的交易都挖矿写入链中了。那么再次通过地址调用时关于合约的数据就都还保留。</span><br><span class="line"># 下面示例在Geth中调用合约的方法。假设我们现在已经重启了Geth控制台，首先还是要用合约地址实例化一个合约出来。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> abi=<span class="built_in">JSON</span>.parse(‘合约的abi’)</span><br><span class="line"><span class="comment">//录入ABI。格式同上一节</span></span><br><span class="line">myContract = eth.contract(abi)</span><br><span class="line"><span class="comment">//创建类</span></span><br><span class="line">contract = myContract.at(address)</span><br><span class="line"><span class="comment">//创建合约实例，这里要指名部署过的合约地址。地址先前已经保存。</span></span><br></pre></td></tr></table></figure>
+<p>通过geth控制台调用智能合约中的函数<br>智能合约中的函数分为两类，一种是需要付gas才能调用的函数，一种是无需花费gas的函数。这两类函数在geth控制台中被调用时用到的命令不一样，这里分别举两个例子。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">personal.unlockAccount(eth.coinbase)</span><br><span class="line"><span class="comment">//记得先解锁账户</span></span><br><span class="line">contract.函数名.sendTransaction(<span class="string">&quot;参数1&quot;</span>,<span class="string">&quot;参数2&quot;</span>,<span class="string">&quot;参数...&quot;</span>,&#123;<span class="attr">from</span>:<span class="string">&quot;0xe473d288faf6c2d1812dbb759d7423605c7d1a58&quot;</span>&#125;)</span><br><span class="line"><span class="comment">//上面是在geth控制台调用transactionn类型（要付gas类的）函数的方法。函数名要替换成自己的，括号内部前部分为函数的参数，分别列出，最后一项大括号内from要写付费的用户的地址（换成自己的）。</span></span><br><span class="line">contract.函数名.call(<span class="string">&quot;参数1&quot;</span>,<span class="string">&quot;参数2&quot;</span>, <span class="string">&quot;参数...&quot;</span>)</span><br><span class="line"><span class="comment">//调用call类型函数的方法，（不要付gas类的）。</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p>所有函数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&gt; eth.</span><br><span class="line">eth._requestManager            eth.getBlockTransactionCount   eth.getUncle</span><br><span class="line">eth.accounts                   eth.getBlockUncleCount         eth.getWork</span><br><span class="line">eth.blockNumber                eth.getCode                    eth.hashrate</span><br><span class="line">eth.call                       eth.getCoinbase                eth.iban</span><br><span class="line">eth.chainId                    eth.getCompilers               eth.icapNamereg</span><br><span class="line">eth.coinbase                   eth.getGasPrice                eth.isSyncing</span><br><span class="line">eth.compile                    eth.getHashrate                eth.mining</span><br><span class="line">eth.constructor                eth.getHeaderByHash            eth.namereg</span><br><span class="line">eth.contract                   eth.getHeaderByNumber          eth.pendingTransactions</span><br><span class="line">eth.defaultAccount             eth.getMining                  eth.protocolVersion</span><br><span class="line">eth.defaultBlock               eth.getPendingTransactions     eth.resend</span><br><span class="line">eth.estimateGas                eth.getProof                   eth.sendIBANTransaction</span><br><span class="line">eth.fillTransaction            eth.getProtocolVersion         eth.sendRawTransaction</span><br><span class="line">eth.filter                     eth.getRawTransaction          eth.sendTransaction</span><br><span class="line">eth.gasPrice                   eth.getRawTransactionFromBlock eth.sign</span><br><span class="line">eth.getAccounts                eth.getStorageAt               eth.signTransaction</span><br><span class="line">eth.getBalance                 eth.getSyncing                 eth.submitTransaction</span><br><span class="line">eth.getBlock                   eth.getTransaction             eth.submitWork</span><br><span class="line">eth.getBlockByHash             eth.getTransactionCount        eth.syncing</span><br><span class="line">eth.getBlockByNumber           eth.getTransactionFromBlock</span><br><span class="line">eth.getBlockNumber             eth.getTransactionReceipt</span><br><span class="line">&gt; personal.</span><br><span class="line">personal._requestManager  personal.getListWallets   personal.lockAccount      personal.signTransaction</span><br><span class="line">personal.constructor      personal.importRawKey     personal.newAccount       personal.unlockAccount</span><br><span class="line">personal.deriveAccount    personal.initializeWallet personal.openWallet       personal.unpair</span><br><span class="line">personal.ecRecover        personal.listAccounts     personal.sendTransaction</span><br><span class="line">personal.getListAccounts  personal.listWallets      personal.sign</span><br><span class="line">&gt; miner.</span><br><span class="line">miner.constructor          miner.propertyIsEnumerable miner.setRecommitInterval  miner.toString</span><br><span class="line">miner.getHashrate          miner.setEtherbase         miner.start                miner.valueOf</span><br><span class="line">miner.hasOwnProperty       miner.setExtra             miner.stop</span><br><span class="line">miner.isPrototypeOf        miner.setGasPrice          miner.toLocaleString</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Part3-本地环境信息"><a href="#Part3-本地环境信息" class="headerlink" title="Part3 本地环境信息"></a>Part3 本地环境信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br></pre></td><td class="code"><pre><span class="line">&gt; admin</span><br><span class="line">		&#123;</span><br><span class="line">		  datadir: <span class="string">&quot;D:\\gethData&quot;</span>,</span><br><span class="line">		  nodeInfo: &#123;</span><br><span class="line">		    enode: <span class="string">&quot;enode://fac072814049255eb2f4c8c2c381183d87ee519d93600852cdcabd7dc3d9224d916be319bb2bfed89430112225f338d9dc15ea818f89cd242e46a05dd6bd63a7@192.168.136.117:30303&quot;</span>,</span><br><span class="line">		    enr: <span class="string">&quot;enr:-Je4QFYrz1dcrKYsGSKlFZARRs4T6pki558pyHzIb1294oLWfgVCCLANovQUjqPjxi7jqfHjS_Elg3BI97K7JyFtbVACg2V0aMfGhMmaRmeAgmlkgnY0gmlwhMCoiHWJc2VjcDI1NmsxoQP6wHKBQEklXrL0yMLDgRg9h-5RnZNgCFLNyr19w9kiTYN0Y3CCdl-DdWRwgnZf&quot;</span>,</span><br><span class="line">		    id: <span class="string">&quot;8a2d0a9309f63565292f84e6286532af5abc27df6abfb93f49c0d2d077b9666d&quot;</span>,</span><br><span class="line">		    ip: <span class="string">&quot;192.168.136.117&quot;</span>,</span><br><span class="line">		    listenAddr: <span class="string">&quot;[::]:30303&quot;</span>,</span><br><span class="line">		    name: <span class="string">&quot;Geth/v1.9.23-stable-8c2f2715/windows-amd64/go1.15&quot;</span>,</span><br><span class="line">		    ports: &#123;</span><br><span class="line">		      discovery: 30303,</span><br><span class="line">		      listener: 30303</span><br><span class="line">		    &#125;,</span><br><span class="line">		    protocols: &#123;</span><br><span class="line">		      eth: &#123;</span><br><span class="line">			config: &#123;...&#125;,</span><br><span class="line">			difficulty: 2000,</span><br><span class="line">			genesis: <span class="string">&quot;0xdc9866ac4601761e6b960e690eb144c03dd48e7125c99e14ecf0a0af5d739224&quot;</span>,</span><br><span class="line">			head: <span class="string">&quot;0xdc9866ac4601761e6b960e690eb144c03dd48e7125c99e14ecf0a0af5d739224&quot;</span>,</span><br><span class="line">			network: 16</span><br><span class="line">		      &#125;</span><br><span class="line">		    &#125;</span><br><span class="line">		  &#125;,</span><br><span class="line">		  peers: [&#123;</span><br><span class="line">		      caps: [<span class="string">&quot;eth/63&quot;</span>],</span><br><span class="line">		      enode: <span class="string">&quot;enode://8192f9e5cfa8fb73e914c39e830211ab2b98d6180df1cf009c1b1c9ddad3bb6d09d986db5ee125f4bb59c226014e72975f170c734774cc389ccb6e6f73fcce34@174.138.19.97:1234&quot;</span>,</span><br><span class="line">		      id: <span class="string">&quot;f227374bcd5f39fff43a333f04cbe43393f5db0baf5eb4ebddd9c8a9ae6fdfbe&quot;</span>,</span><br><span class="line">		      name: <span class="string">&quot;Geth/v1.0.0-stable-7e368c8e/linux-amd64/go1.12.10&quot;</span>,</span><br><span class="line">		      network: &#123;</span><br><span class="line">			inbound: <span class="literal">false</span>,</span><br><span class="line">			localAddress: <span class="string">&quot;192.168.1.118:50638&quot;</span>,</span><br><span class="line">			remoteAddress: <span class="string">&quot;174.138.19.97:1234&quot;</span>,</span><br><span class="line">			static: <span class="literal">false</span>,</span><br><span class="line">			trusted: <span class="literal">false</span></span><br><span class="line">		      &#125;,</span><br><span class="line">		      protocols: &#123;</span><br><span class="line">			eth: <span class="string">&quot;handshake&quot;</span></span><br><span class="line">		      &#125;</span><br><span class="line">		  &#125;, &#123;</span><br><span class="line">		      caps: [<span class="string">&quot;eth/63&quot;</span>, <span class="string">&quot;eth/64&quot;</span>, <span class="string">&quot;eth/65&quot;</span>],</span><br><span class="line">		      enode: <span class="string">&quot;enode://5928e6c7a1b9c90014b5b5ef5fbd305636b477f2e35b5c608ed7fae82e0ea3295be2c716ec50de640e5b0665c44f652cde5c9f3a6e4bcf134657a6944cd91d39@149.5.29.162:30303&quot;</span>,</span><br><span class="line">		      id: <span class="string">&quot;f24d4969e9e4f171b36d962f15ea1bc25b037731a99eee25887b02d1437d09ac&quot;</span>,</span><br><span class="line">		      name: <span class="string">&quot;Pirl/v1.9.12-v7-masternode-premium-lion-ea07aebf-20200407/linux-amd64/go1.13.6&quot;</span>,</span><br><span class="line">		      network: &#123;</span><br><span class="line">			inbound: <span class="literal">false</span>,</span><br><span class="line">			localAddress: <span class="string">&quot;192.168.1.118:50661&quot;</span>,</span><br><span class="line">			remoteAddress: <span class="string">&quot;149.5.29.162:30303&quot;</span>,</span><br><span class="line">			static: <span class="literal">false</span>,</span><br><span class="line">			trusted: <span class="literal">false</span></span><br><span class="line">		      &#125;,</span><br><span class="line">		      protocols: &#123;</span><br><span class="line">			eth: <span class="string">&quot;handshake&quot;</span></span><br><span class="line">		      &#125;</span><br><span class="line">		  &#125;],</span><br><span class="line">		  addPeer: <span class="keyword">function</span>(),</span><br><span class="line">		  addTrustedPeer: <span class="keyword">function</span>(),</span><br><span class="line">		  clearHistory: <span class="keyword">function</span>(),</span><br><span class="line">		  exportChain: <span class="keyword">function</span>(),</span><br><span class="line">		  getDatadir: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getNodeInfo: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getPeers: <span class="keyword">function</span>(callback),</span><br><span class="line">		  importChain: <span class="keyword">function</span>(),</span><br><span class="line">		  removePeer: <span class="keyword">function</span>(),</span><br><span class="line">		  removeTrustedPeer: <span class="keyword">function</span>(),</span><br><span class="line">		  sleep: <span class="keyword">function</span>(),</span><br><span class="line">		  sleepBlocks: <span class="keyword">function</span>(),</span><br><span class="line">		  startRPC: <span class="keyword">function</span>(),</span><br><span class="line">		  startWS: <span class="keyword">function</span>(),</span><br><span class="line">		  stopRPC: <span class="keyword">function</span>(),</span><br><span class="line">		  stopWS: <span class="keyword">function</span>()</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">personal</span><br><span class="line">		&gt; personal</span><br><span class="line">		&#123;</span><br><span class="line">		  listAccounts: [<span class="string">&quot;0xc59256c9f92d19e877d4a9931652ccbcd1260076&quot;</span>],</span><br><span class="line">		  listWallets: [&#123;</span><br><span class="line">		      accounts: [&#123;...&#125;],</span><br><span class="line">		      status: <span class="string">&quot;Locked&quot;</span>,</span><br><span class="line">		      url: <span class="string">&quot;keystore://D:\\gethData\\keystore\\UTC--2020-11-10T00-51-59.108912200Z--c59256c9f92d19e877d4a9931652ccbcd1260076&quot;</span></span><br><span class="line">		  &#125;],</span><br><span class="line">		  deriveAccount: <span class="keyword">function</span>(),</span><br><span class="line">		  ecRecover: <span class="keyword">function</span>(),</span><br><span class="line">		  getListAccounts: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getListWallets: <span class="keyword">function</span>(callback),</span><br><span class="line">		  importRawKey: <span class="keyword">function</span>(),</span><br><span class="line">		  initializeWallet: <span class="keyword">function</span>(),</span><br><span class="line">		  lockAccount: <span class="keyword">function</span>(),</span><br><span class="line">		  newAccount: <span class="keyword">function</span>(),</span><br><span class="line">		  openWallet: <span class="keyword">function</span>(),</span><br><span class="line">		  sendTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  sign: <span class="keyword">function</span>(),</span><br><span class="line">		  signTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  unlockAccount: <span class="keyword">function</span>(),</span><br><span class="line">		  unpair: <span class="keyword">function</span>()</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">miner</span><br><span class="line">		&gt; miner</span><br><span class="line">		&#123;</span><br><span class="line">		  getHashrate: <span class="keyword">function</span>(),</span><br><span class="line">		  setEtherbase: <span class="keyword">function</span>(),</span><br><span class="line">		  setExtra: <span class="keyword">function</span>(),</span><br><span class="line">		  setGasPrice: <span class="keyword">function</span>(),</span><br><span class="line">		  setRecommitInterval: <span class="keyword">function</span>(),</span><br><span class="line">		  start: <span class="keyword">function</span>(),</span><br><span class="line">		  stop: <span class="keyword">function</span>()</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">eth</span><br><span class="line">		&gt; eth</span><br><span class="line">		&#123;</span><br><span class="line">		  accounts: [<span class="string">&quot;0xc59256c9f92d19e877d4a9931652ccbcd1260076&quot;</span>],</span><br><span class="line">		  blockNumber: 0,</span><br><span class="line">		  coinbase: <span class="string">&quot;0xc59256c9f92d19e877d4a9931652ccbcd1260076&quot;</span>,</span><br><span class="line">		  compile: &#123;</span><br><span class="line">		    lll: <span class="keyword">function</span>(),</span><br><span class="line">		    serpent: <span class="keyword">function</span>(),</span><br><span class="line">		    solidity: <span class="keyword">function</span>()</span><br><span class="line">		  &#125;,</span><br><span class="line">		  defaultAccount: undefined,</span><br><span class="line">		  defaultBlock: <span class="string">&quot;latest&quot;</span>,</span><br><span class="line">		  gasPrice: 1000000000,</span><br><span class="line">		  hashrate: 0,</span><br><span class="line">		  mining: <span class="literal">false</span>,</span><br><span class="line">		  pendingTransactions: [],</span><br><span class="line">		  protocolVersion: <span class="string">&quot;0x41&quot;</span>,</span><br><span class="line">		  syncing: <span class="literal">false</span>,</span><br><span class="line">		  call: <span class="keyword">function</span>(),</span><br><span class="line">		  chainId: <span class="keyword">function</span>(),</span><br><span class="line">		  contract: <span class="keyword">function</span>(abi),</span><br><span class="line">		  estimateGas: <span class="keyword">function</span>(),</span><br><span class="line">		  fillTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  filter: <span class="keyword">function</span>(options, callback, filterCreationErrorCallback),</span><br><span class="line">		  getAccounts: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getBalance: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlock: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlockByHash: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlockByNumber: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlockNumber: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getBlockTransactionCount: <span class="keyword">function</span>(),</span><br><span class="line">		  getBlockUncleCount: <span class="keyword">function</span>(),</span><br><span class="line">		  getCode: <span class="keyword">function</span>(),</span><br><span class="line">		  getCoinbase: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getCompilers: <span class="keyword">function</span>(),</span><br><span class="line">		  getGasPrice: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getHashrate: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getHeaderByHash: <span class="keyword">function</span>(),</span><br><span class="line">		  getHeaderByNumber: <span class="keyword">function</span>(),</span><br><span class="line">		  getMining: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getPendingTransactions: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getProof: <span class="keyword">function</span>(),</span><br><span class="line">		  getProtocolVersion: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getRawTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  getRawTransactionFromBlock: <span class="keyword">function</span>(),</span><br><span class="line">		  getStorageAt: <span class="keyword">function</span>(),</span><br><span class="line">		  getSyncing: <span class="keyword">function</span>(callback),</span><br><span class="line">		  getTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  getTransactionCount: <span class="keyword">function</span>(),</span><br><span class="line">		  getTransactionFromBlock: <span class="keyword">function</span>(),</span><br><span class="line">		  getTransactionReceipt: <span class="keyword">function</span>(),</span><br><span class="line">		  getUncle: <span class="keyword">function</span>(),</span><br><span class="line">		  getWork: <span class="keyword">function</span>(),</span><br><span class="line">		  iban: <span class="keyword">function</span>(iban),</span><br><span class="line">		  icapNamereg: <span class="keyword">function</span>(),</span><br><span class="line">		  isSyncing: <span class="keyword">function</span>(callback),</span><br><span class="line">		  namereg: <span class="keyword">function</span>(),</span><br><span class="line">		  resend: <span class="keyword">function</span>(),</span><br><span class="line">		  sendIBANTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  sendRawTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  sendTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  sign: <span class="keyword">function</span>(),</span><br><span class="line">		  signTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  submitTransaction: <span class="keyword">function</span>(),</span><br><span class="line">		  submitWork: <span class="keyword">function</span>()</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BlockChain/" rel="tag">BlockChain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Geth/" rel="tag">Geth</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MetaMask/" rel="tag">MetaMask</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-fabric"
   class="article article-type-post"
   itemscope
@@ -679,7 +893,7 @@
   <time datetime="2020-11-18T04:36:42.000Z" itemprop="datePublished">2020-11-18</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/Blockchain/">Blockchain</a> / <a class="article-category-link" href="/categories/Blockchain/Solidity/">Solidity</a>
+    <a class="article-category-link" href="/categories/BlockChain/">BlockChain</a> / <a class="article-category-link" href="/categories/BlockChain/Solidity/">Solidity</a>
   </div>
    
     </div>
@@ -789,7 +1003,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Blockchain/" rel="tag">Blockchain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Solidity/" rel="tag">Solidity</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BlockChain/" rel="tag">BlockChain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Solidity/" rel="tag">Solidity</a></li></ul>
 
     </footer>
   </div>
@@ -1101,163 +1315,6 @@
     <footer class="article-footer">
        
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Sublime/" rel="tag">Sublime</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-fb"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2020/11/11/fb/"
-    >FISCO BCOS - 01 - 入门</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2020/11/11/fb/" class="article-date">
-  <time datetime="2020-11-11T06:38:59.000Z" itemprop="datePublished">2020-11-11</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/FISCO-BCOS/">FISCO BCOS</a>
-  </div>
-   
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a><strong>安装</strong></h1><p>本章介绍FISCO BCOS所需的必要安装和配置。本章通过在单机上部署一条4节点的FISCO BCOS联盟链，帮助用户掌握FISCO BCOS部署流程。请<a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/hardware_requirements.html">根据这里</a>使用支持的<strong>硬件和平台</strong>操作。</p>
-<p>安装FISCOBCOS：<a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/installation.html">https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/installation.html</a></p>
-<p>国密：<a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/account.html">https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/account.html</a></p>
-<p><strong>单群组**</strong>FISCO BCOS**<strong>联盟链的搭建</strong></p>
-<h2 id="准备环境"><a href="#准备环境" class="headerlink" title="准备环境"></a><strong>准备环境</strong></h2><h3 id="安装centos依赖"><a href="#安装centos依赖" class="headerlink" title="安装centos依赖"></a>安装centos依赖</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y openssl openssl-devel</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2020/11/11/fb/1.png" alt="1"></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~ &amp;&amp; mkdir -p fisco &amp;&amp; <span class="built_in">cd</span> fisco</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>​    下载build_chain.sh脚本</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">curl -<span class="comment">#LO https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v2.6.0/build_chain.sh &amp;&amp; chmod u+x build_chain.sh</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/2.png" alt="2"></p>
-<h3 id="搭建单群组-4-节点联盟链"><a href="#搭建单群组-4-节点联盟链" class="headerlink" title="搭建单群组**4**节点联盟链"></a><strong>搭建单群组**</strong>4**<strong>节点联盟链</strong></h3><p>在fisco目录下执行下面的指令，生成一条单群组4节点的FISCO链。 请确保机器的30300<del>30303，20200</del>20203，8545~8548端口没有被占用。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">**注解**</span><br><span class="line"></span><br><span class="line">&gt; 国密版本请执行 bash build_chain.sh -l 127.0.0.1:4 -p 30300,20200,8545 -g -G</span><br><span class="line"></span><br><span class="line">&gt; 其中-g表示生成国密配置，-G表示使用国密SSL连接</span><br><span class="line"></span><br><span class="line">&gt; web3sdk已经支持国密SSL，如果使用web3sdk建议带上-G选项使用国密SSL</span><br><span class="line"></span><br><span class="line">bash build_chain.sh -l 127.0.0.1:4 -p 30300,20200,8545</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2020/11/11/fb/3.png" alt="3"></p>
-<p><strong>注解</strong></p>
-<p>其中-p选项指定起始端口，分别是p2p_port,channel_port,jsonrpc_port</p>
-<p>出于安全性和易用性考虑，v2.3.0版本最新配置将listen_ip拆分成jsonrpc_listen_ip和channel_listen_ip，但仍保留对listen_ip的解析功能，详细请参考 <a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/configuration.html#rpc">这里</a></p>
-<p>为便于开发和体验，channel_listen_ip参考配置是 <em>0.0.0.0</em> ，出于安全考虑，请根据实际业务网络情况，修改为安全的监听地址，如：内网IP或特定的外网IP</p>
-<p>命令执行成功会输出All completed。如果执行出错，请检查nodes/build.log文件中的错误信息。</p>
-<p><strong>启动**</strong>FISCO BCOS**<strong>链</strong></p>
-<p>启动所有节点</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bash nodes/127.0.0.1/start_all.sh</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2020/11/11/fb/3.1.png" alt="3.1"></p>
-<p>启动成功会输出类似下面内容的响应。否则请使用netstat -an | grep tcp检查机器的30300<del>30303，20200</del>20203，8545~8548端口是否被占用。</p>
-<p><strong>检查进程</strong></p>
-<p>检查进程是否启动</p>
-<p>正常情况会有类似下面的输出； 如果进程数不为4，则进程没有启动（一般是端口被占用导致的）</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef | grep -v grep | grep fisco-bcos</span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/4.png" alt="4"></p>
-<p><strong>检查日志输出</strong></p>
-<p> 如下，查看节点node0链接的节点数</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -f nodes/127.0.0.1/node0/<span class="built_in">log</span>/<span class="built_in">log</span>*  | grep connected</span><br></pre></td></tr></table></figure>
-<p>正常情况会不停地输出链接信息，从输出可以看出node0与另外3个节点有链接。</p>
-<p><img src="/2020/11/11/fb/5.png" alt="5"></p>
-<p>执行下面指令，检查是否在共识</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -f nodes/127.0.0.1/node0/<span class="built_in">log</span>/<span class="built_in">log</span>*  | grep +++</span><br></pre></td></tr></table></figure>
-<p>正常情况会不停输出++++Generating seal，表示共识正常。</p>
-<p><img src="/2020/11/11/fb/6.png" alt="6"></p>
-<p><strong>配置及使用控制台</strong></p>
-<p><strong>重要</strong></p>
-<p>控制台1.x 系列基于 <a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/java_sdk.html">Web3SDK</a> 实现，控制台2.6之后 基于 <a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/java_sdk/index.html">Java SDK</a> 实现，最新版本控制台基于 Java SDK 实现</p>
-<p>2.6及其以上版本控制台使用文档请 <a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/console_of_java_sdk.html">参考这里</a> ，1.x版本控制台使用文档请 <a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/console.html">参考这里</a></p>
-<p>可通过命令 ./start.sh –version 查看当前控制台版本</p>
-<p>基于 <a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/sdk/java_sdk.html">Web3SDK</a> 开发应用时将 solidity 代码转换为 java 代码时，必须使用 1.x 版本控制台，具体请参考 <a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/tutorial/download_console.html">这里</a></p>
-<p>在控制台链接FISCO BCOS节点，实现<strong>查询区块链状态、部署调用合约</strong>等功能，能够快速获取到所需要的信息。2.6版本控制台指令详细介绍<a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/console_of_java_sdk.html">参考这里</a>，1.x版本控制台指令详细介绍<a target="_blank" rel="noopener" href="https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/manual/console.html">参考这里</a>。</p>
-<p><strong>准备依赖</strong></p>
-<p>安装java</p>
-<p><em>#centos<strong>系统安装</strong>java</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y java java-devel</span><br></pre></td></tr></table></figure>
-<p>获取控制台并回到fisco目录</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/fisco &amp;&amp; curl -<span class="comment">#LO https://github.com/FISCO-BCOS/console/releases/download/v2.6.1/download_console.sh &amp;&amp; bash download_console.sh</span></span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/7.png" alt="7"></p>
-<p><strong>注解</strong></p>
-<p>如果因为网络问题导致长时间无法下载，请尝试 <em>cd ~/fisco &amp;&amp; curl -#LO <a target="_blank" rel="noopener" href="https://gitee.com/FISCO-BCOS/console/raw/master/tools/download_console.sh">https://gitee.com/FISCO-BCOS/console/raw/master/tools/download_console.sh</a></em></p>
-<p>拷贝控制台配置文件</p>
-<p>若节点未采用默认端口，请将文件中的20200替换成节点对应的channel端口。</p>
-<p><em>#</em> <em>最新版本控制台使用如下命令拷贝配置文件</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp -n console/conf/config-example.toml console/conf/config.toml</span><br></pre></td></tr></table></figure>
-<p>配置控制台证书</p>
-<p><strong>注解</strong></p>
-<p><strong>使用**</strong>1.x**<strong>版本控制台时：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">搭建国密版时，如果使用国密SSL请执行 cp nodes/127.0.0.1/sdk/gm/* console/conf/</span><br><span class="line"></span><br><span class="line">搭建国密版时，请修改 applicationContext.xml 中 encryptType 修改为1</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp -r nodes/127.0.0.1/sdk/* console/conf/</span><br></pre></td></tr></table></figure>
-<p><strong>启动控制台</strong></p>
-<p>启动</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/fisco/console &amp;&amp; bash start.sh</span><br></pre></td></tr></table></figure>
-<p>输出下述信息表明启动成功 否则请检查conf/config.toml中节点端口配置是否正确</p>
-<p><img src="/2020/11/11/fb/8.png" alt="8"></p>
-<p><strong>使用控制台获取信息</strong></p>
-<p><em>#</em> <em>获取客户端版本</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; getNodeVersion</span><br></pre></td></tr></table></figure>
-
-<p><em>#</em> <em>获取节点链接信息</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; getPeers</span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/9.png" alt="9"></p>
-<p><strong>部署及调用**</strong>HelloWorld**<strong>合约</strong></p>
-<p>HelloWorld合约提供两个接口，分别是get()和set()，用于获取/设置合约变量name。合约内容如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">pragma solidity ^0.4.24;</span><br><span class="line"></span><br><span class="line">contract  HelloWorld &#123;</span><br><span class="line"></span><br><span class="line">    string name;</span><br><span class="line"></span><br><span class="line">    function HelloWorld() &#123;</span><br><span class="line">        name &#x3D; &quot;Hello, World!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function get()constant returns(string) &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function set(string n) &#123;</span><br><span class="line">        name &#x3D; n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>部署**</strong>HelloWorld**<strong>合约</strong></p>
-<p>为了方便用户快速体验，HelloWorld合约已经内置于控制台中，位于控制台目录下contracts/solidity/HelloWorld.sol，参考下面命令部署即可。</p>
-<p><em>#</em> <em>在控制台输入以下指令</em> <em>部署成功则返回合约地址</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; deploy HelloWorld</span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/10.png" alt="10"></p>
-<p><strong>调用**</strong>HelloWorld**<strong>合约</strong></p>
-<p><em>#</em> <em>查看当前块高</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; getBlockNumber</span><br></pre></td></tr></table></figure>
-<p><em>#</em> <em>调用<strong>get</strong>接口获取<strong>name</strong>变量</em> <em>此处的合约地址是<strong>deploy</strong>指令返回的地址</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; call HelloWorld 0xb3c223fc0bf6646959f254ac4e4a7e355b50a344 get</span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/11.png" alt="11"></p>
-<p><em>#</em> <em>查看当前块高，块高不变，因为<strong>get</strong>接口不更改账本状态</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; getBlockNumber</span><br></pre></td></tr></table></figure>
-<p><em>#</em> <em>调用<strong>set</strong>设置**name</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; call HelloWorld 0xb3c223fc0bf6646959f254ac4e4a7e355b50a344 <span class="built_in">set</span> <span class="string">&quot;Hello, FISCO BCOS&quot;</span></span><br></pre></td></tr></table></figure>
-<p><em>#</em> <em>再次查看当前块高，块高增加表示已出块，账本状态已更改</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; getBlockNumber</span><br></pre></td></tr></table></figure>
-<p><em>#</em> <em>调用<strong>get</strong>接口获取<strong>name</strong>变量，检查设置是否生效</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; call HelloWorld 0xb3c223fc0bf6646959f254ac4e4a7e355b50a344 get</span><br></pre></td></tr></table></figure>
-<p><img src="/2020/11/11/fb/12.png" alt="12"></p>
-<p><em>#</em> <em>退出控制台</em></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[group:1]&gt; quit</span><br></pre></td></tr></table></figure>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/FISCO-BCOS/" rel="tag">FISCO BCOS</a></li></ul>
 
     </footer>
   </div>
