@@ -216,6 +216,200 @@
 
     
     <article
+  id="post-01fabric"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/12/15/01fabric/"
+    >Hyperledger Fabric - 01 - 安装并测试网络</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/12/15/01fabric/" class="article-date">
+  <time datetime="2020-12-15T02:31:23.000Z" itemprop="datePublished">2020-12-15</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/BlockChain/">BlockChain</a> / <a class="article-category-link" href="/categories/BlockChain/Hyperledger-Fabric/">Hyperledger Fabric</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Hyperledger-Fabric-搭建并测试"><a href="#Hyperledger-Fabric-搭建并测试" class="headerlink" title="Hyperledger Fabric 搭建并测试"></a>Hyperledger Fabric 搭建并测试</h1><h2 id="一、环境准备"><a href="#一、环境准备" class="headerlink" title="一、环境准备"></a>一、环境准备</h2><table>
+<thead>
+<tr>
+<th>系统工具</th>
+<th>版本</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CentOS</td>
+<td>7</td>
+<td></td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>18.09.4</td>
+<td>参考：<a target="_blank" rel="noopener" href="https://zzugo.ayxyj.cn/2020/11/01/docker/">Centps7安装docker</a></td>
+</tr>
+<tr>
+<td>Docker-compose</td>
+<td>1.25.0</td>
+<td>参考下方</td>
+</tr>
+<tr>
+<td>GO</td>
+<td>1.13.4</td>
+<td>参考：<a target="_blank" rel="noopener" href="https://golang.org/dl/">CentOS7下载Go</a> 解压配置环境变量即可</td>
+</tr>
+</tbody></table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装docker-compose</span></span><br><span class="line"><span class="comment">#方式一：</span></span><br><span class="line">curl -L https://github.com/docker/compose/releases/download/1.25.0-rc1/docker-compose-`uname -s`-`uname -m` -o /usr/<span class="built_in">local</span>/bin/docker-compose </span><br><span class="line">sudo chmod +x /usr/<span class="built_in">local</span>/bin/docker-compose</span><br><span class="line"><span class="comment">#方式二：</span></span><br><span class="line">pip install -U docker-compose==1.23.2</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、安装fabric2-x"><a href="#二、安装fabric2-x" class="headerlink" title="二、安装fabric2.x"></a>二、安装fabric2.x</h2><ul>
+<li>首先，自行下载fabric源码<a target="_blank" rel="noopener" href="https://github.com/hyperledger/fabric.git">git clone</a>，将下载的fabric包解压出来，进入到<code>$&#123;HOME&#125;/fabric/scripts</code>脚本目录进行安装</li>
+</ul>
+<p><img src="/2020/12/15/01fabric/1.png" alt="1"></p>
+<ul>
+<li>下载过程比较漫长，因为采用的是docker镜像容器进行安装，需要下载所需要的镜像，我这里面拉取了所有的镜像，很多暂时不用（2.x不支持kafka,zookeeper）</li>
+</ul>
+<ul>
+<li>脚本执行结束后，可以看到相关镜像等其他信息，如果存在没有拉取完的镜像，就在执行一边。</li>
+</ul>
+<p><img src="/2020/12/15/01fabric/2.png" alt="2"></p>
+<ul>
+<li>通过docker查看拉取的镜像信息<code>docker image ls -a</code></li>
+</ul>
+<p><img src="/2020/12/15/01fabric/3.png" alt="3"></p>
+<p>执行完如上图，另外在scripts目录下会多出来一个fabric-samples目录</p>
+<h2 id="三、启动test-network测试网络"><a href="#三、启动test-network测试网络" class="headerlink" title="三、启动test-network测试网络"></a>三、启动test-network测试网络</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">[root@XiaYuJie_fabric test-network]# .&#x2F;network.sh up createChannel -c zzuChannel -ca</span><br><span class="line"></span><br><span class="line">Unknown flag: createChannel</span><br><span class="line"></span><br><span class="line">Usage: </span><br><span class="line">  network.sh &lt;Mode&gt; [Flags]</span><br><span class="line">    &lt;Mode&gt;</span><br><span class="line">      - &#39;up&#39; - bring up fabric orderer and peer nodes. No channel is created</span><br><span class="line">      - &#39;up createChannel&#39; - bring up fabric network with one channel</span><br><span class="line">      - &#39;createChannel&#39; - create and join a channel after the network is created</span><br><span class="line">      - &#39;deployCC&#39; - deploy the fabcar chaincode on the channel</span><br><span class="line">      - &#39;down&#39; - clear the network with docker-compose down</span><br><span class="line">      - &#39;restart&#39; - restart the network</span><br><span class="line"></span><br><span class="line">    Flags:</span><br><span class="line">    -ca &lt;use CAs&gt; -  create Certificate Authorities to generate the crypto material</span><br><span class="line">    -c &lt;channel name&gt; - channel name to use (defaults to &quot;mychannel&quot;)</span><br><span class="line">    -s &lt;dbtype&gt; - the database backend to use: goleveldb (default) or couchdb</span><br><span class="line">    -r &lt;max retry&gt; - CLI times out after certain number of attempts (defaults to 5)</span><br><span class="line">    -d &lt;delay&gt; - delay duration in seconds (defaults to 3)</span><br><span class="line">    -l &lt;language&gt; - the programming language of the chaincode to deploy: go (default), java, javascript, typescript</span><br><span class="line">    -v &lt;version&gt;  - chaincode version. Must be a round number, 1, 2, 3, etc</span><br><span class="line">    -i &lt;imagetag&gt; - the tag to be used to launch the network (defaults to &quot;latest&quot;)</span><br><span class="line">    -cai &lt;ca_imagetag&gt; - the image tag to be used for CA (defaults to &quot;latest&quot;)</span><br><span class="line">    -verbose - verbose mode</span><br><span class="line">  network.sh -h (print this message)</span><br><span class="line"></span><br><span class="line"> Possible Mode and flags</span><br><span class="line">  network.sh up -ca -c -r -d -s -i -verbose</span><br><span class="line">  network.sh up createChannel -ca -c -r -d -s -i -verbose</span><br><span class="line">  network.sh createChannel -c -r -d -verbose</span><br><span class="line">  network.sh deployCC -l -v -r -d -verbose</span><br><span class="line"></span><br><span class="line"> Taking all defaults:</span><br><span class="line">	network.sh up</span><br><span class="line"></span><br><span class="line"> Examples:</span><br><span class="line">  network.sh up createChannel -ca -c mychannel -s couchdb -i 2.0.0</span><br><span class="line">  network.sh createChannel -c channelName</span><br><span class="line">  network.sh deployCC -l javascript</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /fabric-samples/test-network</span><br><span class="line">network.sh up</span><br></pre></td></tr></table></figure>
+
+<p>如下图，表示启动成功，已启动一个orderer节点和两个peer节点。</p>
+<p><img src="/2020/12/15/01fabric/4.png" alt="4"></p>
+<p>可以查看本地启动的docker container 存在测试网络启动的oder和peer</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker ps -a  <span class="comment">#查看启动的container</span></span><br><span class="line">docker container ls -a <span class="comment">#查看启动的container</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/12/15/01fabric/5.png" alt="5"></p>
+<h2 id="四、使用测试网络"><a href="#四、使用测试网络" class="headerlink" title="四、使用测试网络"></a>四、使用测试网络</h2><ul>
+<li>创建channel，使用network.sh脚本创建来创建一个连接org1和org2组织并加入他们peer的通道，命令如下：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh createChannel</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/12/15/01fabric/6.png" alt="6"></p>
+<p><img src="/2020/12/15/01fabric/7.png" alt="7"></p>
+<p>如上图，创建成功（默认通道名为mychannel）。</p>
+<p>也可以带上channel标签，命令如下（-c channelName）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh createChannel -c channel1</span><br></pre></td></tr></table></figure>
+
+<p>如果要在一个步骤中启动网络并创建频道，可以同时使用up和create channel模式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh up createChannel</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>在通道上启动链码。</li>
+</ul>
+<p>使用network.sh创建通道之后，可以使用以下命令在通道上启动链码（默认使用go语言）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh deployCC</span><br></pre></td></tr></table></figure>
+
+<p>可以指定语言，加-l ，比如用java，命令如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh deployCC -l java</span><br></pre></td></tr></table></figure>
+
+<p>如图，启动成功：</p>
+<p><img src="/2020/12/15/01fabric/8.png" alt="8"></p>
+<ul>
+<li>与网络互动</li>
+</ul>
+<p>网络启动之后，可以使用peer cli客户端去操作网络，可以通过cli客户端去调用部署智能合约，更新通道，或者安装和部署新的智能合约。</p>
+<p><img src="/2020/12/15/01fabric/1606741674241.png" alt="1606741674241"></p>
+<p>首先确保<code>操作目录为test-network目录</code>。使用以下命令将二进制文件添加到cli路径：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$&#123;PWD&#125;</span>/../bin:<span class="variable">$&#123;PWD&#125;</span>:<span class="variable">$PATH</span></span><br></pre></td></tr></table></figure>
+
+<p>还需要设置<code>FABRIC_CFG_PATH路径指向fabric-samples中的core.yaml文件，命令如下：</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> FABRIC_CFG_PATH=<span class="variable">$PWD</span>/../config/</span><br></pre></td></tr></table></figure>
+
+<p>设置允许org1操作peer cli的环境变量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Environment variables for Org1</span></span><br><span class="line"><span class="built_in">export</span> CORE_PEER_TLS_ENABLED=<span class="literal">true</span></span><br><span class="line"><span class="built_in">export</span> CORE_PEER_LOCALMSPID=<span class="string">&quot;Org1MSP&quot;</span></span><br><span class="line"><span class="built_in">export</span> CORE_PEER_TLS_ROOTCERT_FILE=<span class="variable">$&#123;PWD&#125;</span>/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt</span><br><span class="line"><span class="built_in">export</span> CORE_PEER_ADDRESS=localhost:7051</span><br><span class="line"><span class="built_in">export</span> CORE_PEER_MSPCONFIGPATH=<span class="variable">$&#123;PWD&#125;</span>/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp</span><br></pre></td></tr></table></figure>
+
+<p>如上，<code>CORE_PEER_TLS_ROOTCERT_FILE和CORE_PEER_MSPCONFIGPATH环境变量指向organizations文件夹中的org1的加密文件。</code></p>
+<p>使用以下命令获取汽车资产列表：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"> peer chaincode query -C mychannel -n fabcar -c <span class="string">&#x27;&#123;&quot;Args&quot;:[&quot;queryAllCars&quot;]&#125;&#x27;</span></span><br><span class="line"> <span class="comment">#result</span></span><br><span class="line"> [&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR0&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Toyota&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;Prius&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;blue&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Tomoko&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR1&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Ford&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;Mustang&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;red&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Brad&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR2&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Hyundai&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;Tucson&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;green&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Jin Soo&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR3&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Volkswagen&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;Passat&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;yellow&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Max&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR4&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Tesla&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;S&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;black&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Adriana&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR5&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Peugeot&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;205&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;purple&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Michel&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR6&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Chery&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;S22L&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;white&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Aarav&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR7&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Fiat&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;Punto&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;violet&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Pari&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR8&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Tata&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;Nano&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;indigo&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Valeria&quot;</span>&#125;&#125;,</span><br><span class="line">&#123;<span class="string">&quot;Key&quot;</span>:<span class="string">&quot;CAR9&quot;</span>, <span class="string">&quot;Record&quot;</span>:&#123;<span class="string">&quot;make&quot;</span>:<span class="string">&quot;Holden&quot;</span>,<span class="string">&quot;model&quot;</span>:<span class="string">&quot;Barina&quot;</span>,<span class="string">&quot;colour&quot;</span>:<span class="string">&quot;brown&quot;</span>,<span class="string">&quot;owner&quot;</span>:<span class="string">&quot;Shotaro&quot;</span>&#125;&#125;]</span><br></pre></td></tr></table></figure>
+
+<p>当网络成员想要转移或更改总账上的资产时，就会调用链码。通过调用fabcar链码，使用以下命令更改帐本上的资产所有者:</p>
+<p>(Chaincodes are invoked when a network member wants to transfer or change an asset on the ledger. Use the following command to change the owner of a car on the ledger by invoking the fabcar chaincode:)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $&#123;PWD&#125;&#x2F;organizations&#x2F;ordererOrganizations&#x2F;example.com&#x2F;orderers&#x2F;orderer.example.com&#x2F;msp&#x2F;tlscacerts&#x2F;tlsca.example.com-cert.pem -C mychannel -n fabcar --peerAddresses localhost:7051 --tlsRootCertFiles $&#123;PWD&#125;&#x2F;organizations&#x2F;peerOrganizations&#x2F;org1.example.com&#x2F;peers&#x2F;peer0.org1.example.com&#x2F;tls&#x2F;ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles $&#123;PWD&#125;&#x2F;organizations&#x2F;peerOrganizations&#x2F;org2.example.com&#x2F;peers&#x2F;peer0.org2.example.com&#x2F;tls&#x2F;ca.crt -c &#39;&#123;&quot;function&quot;:&quot;changeCarOwner&quot;,&quot;Args&quot;:[&quot;CAR9&quot;,&quot;Dave&quot;]&#125;&#39;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2020-11-30 08:09:25.532 EST [chaincodeCmd] chaincodeInvokeOrQuery -&gt; INFO 001 Chaincode invoke successful. result: status:200 </span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/12/15/01fabric/1606741941280.png" alt="1606741941280"></p>
+<p>在调用链代码之后，我们可以使用另一个查询来查看调用如何更改了区块链分类账上的资产。因为我们已经查询了Org1对等点，所以我们可以利用这个机会查询在Org2对等点上运行的链代码。将以下环境变量设置为Org2:</p>
+<p>After we invoke the chaincode, we can use another query to see how the invoke changed the assets on the blockchain ledger. Since we already queried the Org1 peer, we can take this opportunity to query the chaincode running on the Org2 peer. Set the following environment variables to operate as Org2:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># Environment variables for Org2</span><br><span class="line"></span><br><span class="line">export CORE_PEER_TLS_ENABLED&#x3D;true</span><br><span class="line">export CORE_PEER_LOCALMSPID&#x3D;&quot;Org2MSP&quot;</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE&#x3D;$&#123;PWD&#125;&#x2F;organizations&#x2F;peerOrganizations&#x2F;org2.example.com&#x2F;peers&#x2F;peer0.org2.example.com&#x2F;tls&#x2F;ca.crt</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH&#x3D;$&#123;PWD&#125;&#x2F;organizations&#x2F;peerOrganizations&#x2F;org2.example.com&#x2F;users&#x2F;Admin@org2.example.com&#x2F;msp</span><br><span class="line">export CORE_PEER_ADDRESS&#x3D;localhost:9051</span><br></pre></td></tr></table></figure>
+
+<p>你现在可以在“peer0.org2.example.com”上查询fabcar链码:</p>
+<p>You can now query the fabcar chaincode running on <code>peer0.org2.example.com</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">peer chaincode query -C mychannel -n fabcar -c &#39;&#123;&quot;Args&quot;:[&quot;queryCar&quot;,&quot;CAR9&quot;]&#125;&#39;</span><br></pre></td></tr></table></figure>
+
+<p>结果将显示‘CAR9’转移给Dave:</p>
+<p>The result will show that <code>&quot;CAR9&quot;</code> was transferred to Dave:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;make&quot;:&quot;Holden&quot;,&quot;model&quot;:&quot;Barina&quot;,&quot;colour&quot;:&quot;brown&quot;,&quot;owner&quot;:&quot;Dave&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/12/15/01fabric/1606742208875.png" alt="1606742208875"></p>
+<h2 id="五、关闭网络"><a href="#五、关闭网络" class="headerlink" title="五、关闭网络"></a>五、关闭网络</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh down</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/12/15/01fabric/10.png" alt="10"></p>
+<h3 id="启动过程详解"><a href="#启动过程详解" class="headerlink" title="启动过程详解"></a>启动过程详解</h3><ul>
+<li><code>./network.sh</code>为两个peer节点和一个order节点创建了证书和密钥，默认情况下，脚本会利用在organizations/cryptogen文件夹下的加密工具。</li>
+<li>脚本利用configtxgen工具创建了系统的创世块，它使用<code>configtx/configtx.yaml</code>文件来创建创世块，并存储在system-genesis-block文件夹中。</li>
+<li>当上述两步完成之后，<code>./network.sh</code>会启动网络，脚本利用在docker文件夹下的<code>docker-compose-test-net.yaml</code>文件创建peer和orderer节点。</li>
+<li>如果使用了<code>createChannel</code>子命令，脚本还会运行script文件夹下的<code>createChannel.sh</code>脚本来创建所需要的channel，脚本会用peer命令来创建channel，加入两个组织。</li>
+<li>如果运行了deployCC命令，脚本会在所有peers上运行script下的<code>deployCC.sh</code>脚本来安装fabcar chaincode，在chaincode的定义被提交到channel之后，peer命令会调用init函数来初始化chaincode，并将所需的数据放入chaincode中。</li>
+</ul>
+<p>注：下图是fabric简化交易过程</p>
+<p><img src="/2020/12/15/01fabric/11.png" alt="11"></p>
+<h2 id="六、标志并启动网络（ca为网络的标志）"><a href="#六、标志并启动网络（ca为网络的标志）" class="headerlink" title="六、标志并启动网络（ca为网络的标志）"></a>六、标志并启动网络（ca为网络的标志）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh up -ca</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/12/15/01fabric/Users/AYXYJ/Desktop/fabric/hyperledger%20fabric%20note/fabric/12.png" alt="标志并启动网络"></p>
+<p>值得花一些时间检查<code>/ network.sh</code>脚本部署CA之后生成的日志。 测试网络使用Fabric CA客户端以每个组织的CA注册节点和用户身份。 之后这个脚本使用enroll命令为每个身份生成一个MSP文件夹。 MSP文件夹包含每个身份的证书和私钥，以及在运营CA的组织中建立身份的角色和成员身份。 您可以使用以下命令来检查Org1管理员用户的MSP文件夹：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tree organizations&#x2F;peerOrganizations&#x2F;org1.example.com&#x2F;users&#x2F;Admin@org1.example.com&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>该命令将显示MSP文件夹的结构和配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">organizations&#x2F;peerOrganizations&#x2F;org1.example.com&#x2F;users&#x2F;Admin@org1.example.com&#x2F;</span><br><span class="line">└── msp</span><br><span class="line">    ├── IssuerPublicKey</span><br><span class="line">    ├── IssuerRevocationPublicKey</span><br><span class="line">    ├── cacerts</span><br><span class="line">    │   └── localhost-7054-ca-org1.pem</span><br><span class="line">    ├── config.yaml</span><br><span class="line">    ├── keystore</span><br><span class="line">    │   └── 58e81e6f1ee8930df46841bf88c22a08ae53c1332319854608539ee78ed2fd65_sk</span><br><span class="line">    ├── signcerts</span><br><span class="line">    │   └── cert.pem</span><br><span class="line">    └── user</span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BlockChain/" rel="tag">BlockChain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hyperledger-Fabric/" rel="tag">Hyperledger Fabric</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-Geth_note"
   class="article article-type-post"
   itemscope
@@ -931,11 +1125,7 @@
     <div class="article-meta">
       <a href="/2020/11/25/fabric/" class="article-date">
   <time datetime="2020-11-25T02:31:23.000Z" itemprop="datePublished">2020-11-25</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/BlockChain/">BlockChain</a> / <a class="article-category-link" href="/categories/BlockChain/Hyperledger-Fabric/">Hyperledger Fabric</a>
-  </div>
-   
+</a>    
     </div>
       
     <div class="article-entry" itemprop="articleBody">
@@ -1063,8 +1253,6 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BlockChain/" rel="tag">BlockChain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hyperledger-Fabric/" rel="tag">Hyperledger Fabric</a></li></ul>
-
     </footer>
   </div>
 
@@ -1439,68 +1627,6 @@
     <footer class="article-footer">
        
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BlockChain/" rel="tag">BlockChain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IPFS/" rel="tag">IPFS</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-Hexo-本地图片-md"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/"
-    >Hexo_本地图片如何上传到Github</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/" class="article-date">
-  <time datetime="2020-11-13T09:49:25.000Z" itemprop="datePublished">2020-11-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Hexo/">Hexo</a>
-  </div>
-   
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h2><ul>
-<li>首先进行配置文件的修改， _config.yml(不是主题配置文件)<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">post_asset_folder: <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-<img src="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/1.png" alt="修改配置项"><h2 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-asset-image --save</span><br></pre></td></tr></table></figure>
-<img src="/2020/11/13/Hexo-%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87-md/2.png" alt="install"><h2 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h2></li>
-<li>通过命令，创建一篇新的文章时候，自动在source/_post/新建对应文件名称的文件夹（为了避免有时候文章中并没有图片，可以手动创建md文件，需要图片在创建文件夹即可）<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new test.md</span><br></pre></td></tr></table></figure></li>
-<li>进入source/_post/下即可看到对应创建的文件和文件夹<h2 id="第四步"><a href="#第四步" class="headerlink" title="第四步"></a>第四步</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean  <span class="comment">#清除</span></span><br><span class="line">hexo ge    <span class="comment">#生成静态资源 ， 此时可以通过输出信息看到对应的图片名称信息，基本就完成了</span></span><br><span class="line">hexo s     <span class="comment">#本地查看是否生效</span></span><br></pre></td></tr></table></figure>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2></li>
-<li>在md文件中，图片的路径可以写一下两种方式都可以load到图片的路径<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">![test1](./1.png)</span><br><span class="line">![test1](./<span class="built_in">test</span>/2.png)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li></ul>
 
     </footer>
   </div>
